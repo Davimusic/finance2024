@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://res.cloudinary.com/dplncudbq/image/upload/v1658015902/mias/i1_ndc8ga.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Playfair Display">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css' ) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkbox.css' ) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css' ) }}">
+    <title>referencias</title>
+</head>
+<body onload="a('{{ texto }}', '{{ aviso }}')">
+    <div id="padreMenu" style="overflow: hidden; height: 40px; overflow-y: auto;"></div>
+</body>
+<script>
+function a(texto, aviso){
+    let Referencia = retornarReferencias(texto)
+    console.log(Referencia);
+    let referencia = ""
+    let cod = `
+    ${menu()}
+    <div id="componente" class="color1 borde1 padding1 sombra" style="margin-bottom:5%; margin:5%; margin-top:10%;"> 
+        <form method="post">
+            <input style="display:none;" value = "crear" class="borde1 color4" type="text" name="formUso" id="formUso" required>
+            
+            <div style="margin-bottom:10px;">
+                <label class="content-input">
+                    <input class="color4" onclick="activarSwicht(this.id)" type="checkbox" checked = "true" name="Vehiculo" id="crear" value="">Crear nueva referencia
+                    <i></i>
+                </label>
+                <input style="width:100%;" value="" class="borde1 color4" type="text" name="crear" id="inputcrear">
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label style="margin-bottom:10px;" class="content-input">
+                    <input class="color4" onclick="activarSwicht(this.id)" type="checkbox" name="Vehiculo" id="cambiar" value="">Cambiar nombre de referencia
+                    <i></i>
+                </label>
+                <label style="display:none; padding-top: 5%;" class="content-input" id='nuevocambiar'> Nuevo nombre a usar </label>
+                <input style="margin-bottom:10px; width:100%; display:none;" value="" class="borde1 color4" type="text" name="nuevocambiar" id="inputnuevocambiar">
+                <label style="display:none;" class="content-input" id='antiguocambiar'> Actual referencia a usar </label>
+                <select style="margin-bottom:5%; margin-top:23px; width:100%; display: none;" class="borde1 color4" name="cambiar" id="inputcambiar">`
+                for (let u = 0; u < Referencia.length; u++) {
+                    console.log('entra');
+                    let seleccionar = ""
+                    //console.log(`referencia: ${referencia}, Referencia[u]: ${Referencia[u]}`);
+                    if(referencia == Referencia[u]){
+                        seleccionar = "selected"
+                    }
+                cod +=`<option ${seleccionar} value="${Referencia[u]}">${Referencia[u]}</option>`
+                }
+                cod +=    
+                `
+                </select>
+            </div>   
+
+            <div style="margin-bottom:10px;">
+                <label style="margin-bottom:10px;" class="content-input">
+                    <input onclick="activarSwicht(this.id)" type="checkbox" name="Vehiculo" id="borrar" value="">Borrar referencia
+                    <i></i>
+                </label>
+                <select style="margin-bottom:10px; margin-top:25px; display: none; width:100%;" class="borde1 color4" name="borrar" id="inputborrar" >`
+                for (let u = 0; u < Referencia.length; u++) {
+                    let seleccionar = ""
+                    //console.log(`referencia: ${referencia}, Referencia[u]: ${Referencia[u]}`);
+                    if(referencia == Referencia[u]){
+                        seleccionar = "selected"
+                    }
+                cod +=`<option ${seleccionar} value="${Referencia[u]}">${Referencia[u]}</option>`
+                }
+                cod +=    
+                `
+                </select>
+            </div> 
+            
+            <button  style=" background: none; border: none; height:40px; padding-top: 5%;" type="submit"><img onclick="rotar('botonEditar')" class="efectoMenu" style="height:40px; border-radius:50%; background: white;" id="botonEditar" src="https://res.cloudinary.com/dplncudbq/image/upload/v1671160860/mias/descarga_uomlyb.png" alt=""></button>
+        </form>  
+    </div>`
+    document.getElementById("padreMenu").innerHTML = cod;
+    if(aviso != ''){
+        alert(aviso)
+    }
+}
+
+
+function verificarContenidoArreglo(arr, accSiEstaVacio, accSiNoEstaVacio){
+    let text = ''
+    if(arr.length = 0 || arr[0] == ''){
+        text = accSiEstaVacio
+    } else {
+        text = accSiNoEstaVacio
+    }
+    console.log(text);
+    return text
+}
+
+function activarSwicht(id){
+    let arr = ['cambiar', 'crear', 'borrar']
+    for (let u = 0; u < arr.length; u++) {
+        if(id == arr[u]){
+            document.getElementById(arr[u]).checked = true;
+            document.getElementById(`input${arr[u]}`).style.display = 'flex';
+            document.getElementById('formUso').value = arr[u]
+        } else {
+            document.getElementById(arr[u]).checked = false;
+            document.getElementById(`input${arr[u]}`).style.display = 'none';
+            document.getElementById(`inputnuevocambiar`).style.display = 'none';
+            document.getElementById(`nuevocambiar`).style.display = 'none';
+            document.getElementById(`antiguocambiar`).style.display = 'none';
+        }
+    }
+    if(id == 'cambiar'){
+        document.getElementById(`antiguocambiar`).style.display = 'flex';
+        document.getElementById(`inputnuevocambiar`).style.display = 'flex';
+        document.getElementById(`nuevocambiar`).style.display = 'flex';
+    }
+}
+
+</script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/arranque.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/menu.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/anotaciones.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/graficosAnual.js') }}"></script>
+
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="https://res.cloudinary.com/dplncudbq/image/upload/v1658015902/mias/i1_ndc8ga.png">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Playfair Display">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css' ) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css' ) }}">
+    <title>logeo</title>
+</head>
+<body onload="aviso('{{ mensaje }}')">
+
+    <div id = 'padre' style="justify-content: center; align-items: center; display: flex;"> 
+        <div class="color1 borde1 padding1 sombra" style="width: fit-content; height: fit-content;">
+            <form method="post">
+
+                <div style="margin-bottom:10%;">
+                    <label for="">Email</label>
+                </div> 
+                <input style="width:100%; margin-bottom:10%;" value="" class="borde1" type="usuario" name="email"  required>
+                <div style="margin-bottom:10%;">
+                    <label for="">Contraseña</label>
+                </div> 
+                <input style="width:100%; margin-bottom:10%;" value="" class="borde1" type="password" name="contrasena"  required>
+                
+                <div style="margin-bottom:10%;">
+                    <label id="repetirContrasenaLabel" style="display: none;" for="">Repite la contraseña</label>
+                </div> 
+                <input id="repetirContrasenaInput" style="width:100%; margin-bottom:10%; display: none;" value="" class="borde1" type="password" name="contrasenaComparar" >
+
+                <input id="estadoLogeo" style="display: none;" value="existente" type="text" name="estadoLogeo" >
+                
+                <button style="background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" id="botonEditar" src="https://res.cloudinary.com/dplncudbq/image/upload/v1671160860/mias/descarga_uomlyb.png" alt=""></button>
+            
+            </form> 
+            <div style="display: block;">
+                <div onclick="opcionLogeo('nuevo')" style="cursor: pointer;">
+                    <label for="">crear nueva cuenta</label>
+                </div>
+                <div onclick="opcionLogeo('existente')" style="cursor: pointer;">
+                    <label for="">Logear usuario existente</label>
+                </div>
+            </div>
+        </div>    
+    </div>
+
+</body>
+
+<script>
+    function opcionLogeo(acc){
+        let repetirContrasenaLabel = document.getElementById('repetirContrasenaLabel')
+        let repetirContrasenaInput = document.getElementById('repetirContrasenaInput')
+        let estadoLogeo = document.getElementById('estadoLogeo')
+        if (acc == 'nuevo'){
+            repetirContrasenaLabel.style.display = 'block'
+            repetirContrasenaInput.style.display = 'block'
+            repetirContrasenaInput.required = true;
+        } else {
+            repetirContrasenaLabel.style.display = 'none'
+            repetirContrasenaInput.style.display = 'none'
+            repetirContrasenaInput.required = false;
+        }
+        estadoLogeo.value = acc
+    }
+
+    function aviso(mensaje){
+        if(mensaje != ''){
+            alert(mensaje)
+        }
+    }
+
+    let divPadre = document.getElementById('padre').style.paddingTop = `${((window.innerHeight/100)*20)}px`
+    
+</script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/arranque.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/graficosAnual.js') }}"></script>
+
+</html>

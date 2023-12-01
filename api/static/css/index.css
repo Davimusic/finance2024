@@ -1,0 +1,201 @@
+html * { font-size:large !important; color: rgb(255, 255, 255) !important; font-family: "Outfit Display", sans-serif !important; }
+
+div::-webkit-scrollbar, select::-webkit-scrollbar, textarea::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
+
+div, select, textarea {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+p{
+  margin: 0;
+}
+
+.efectoMenu{
+  transition: 0.5s;
+}
+
+.efectoMenu:hover{
+  background-color: #3c8179;
+  -webkit-box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.44); 
+  box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.44);
+}
+
+.centrar{
+  text-align: center;
+}
+
+body{
+  background-image: url("https://res.cloudinary.com/dplncudbq/image/upload/v1670631081/mias/fondoConta_wlzfws.png");
+}
+
+.fondoTransparente{
+  background: #00000065;
+}
+
+.rangeLimpio {
+  width: 80%;
+  height: 10px;
+  -webkit-appearance: none;
+  outline: none;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.rangeLimpio::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%; 
+  background: #2b2828;
+  cursor: pointer;
+}
+
+.rangeLimpio::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #2b2828;
+  cursor: pointer;
+}
+
+.sobresalir{
+  z-index: 1000;
+}
+
+.mano{
+  cursor:pointer;
+}
+
+.posicionAbsoluta{
+  position: absolute;
+}
+
+.posicionRelativa{
+  position: relative;
+}
+
+.sticky{
+  position: -webkit-sticky;  /*/ required for Safari*/
+  position: sticky;
+  top: 0; /*/ required as well.*/
+}
+
+.none{
+  display: none;
+}
+
+.ListaLimpia{
+  list-style-type:none;
+  list-style: none;
+  margin: 0;
+  text-decoration: none;
+  padding-top: 10px;
+  
+}
+
+.sombra{
+  -webkit-box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.44); 
+  box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.44);
+}
+
+.paddingSuperiorInferior{
+  padding-top: 2%;
+  padding-bottom: 2%;
+}
+
+.contenedorGaleria{
+  width: 100%;
+  height: auto;
+  flex-wrap: wrap;
+}
+
+input, select{
+  /*background: red;*/
+  border:none;
+  cursor: pointer;
+}
+
+textarea{
+  resize: none;
+}
+
+button, .mano{
+  cursor: pointer;
+}
+
+.padding1{
+  padding: 2%;
+}
+
+.borde1{
+  border-radius:0.5em;
+}
+
+.borde2{
+  border-radius: 0.5em;
+}
+
+.espacioEquilatero{
+  justify-content: space-between;
+}
+
+@media (max-width: 640px) {
+  .espacioEquilatero{
+    justify-content:center;
+  }
+}
+
+.slide.esconder{
+  display: none;
+}
+
+.slide{
+  animation: aparecer 2s;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; }
+  to {opacity: 1; }
+}
+
+.color1{
+  background: #1d1717;
+}
+
+.color2{
+  background: #344d5a;
+}
+
+.color3{
+  background: #85cddb;
+}
+
+.color4{
+  background: rgb(68, 16, 102)
+}
+
+.flex{
+    display: flex;
+}
+
+.block{
+  display: block;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+canvas#myChart {
+  /* Anula cualquier estilo anterior que establezca el tamaño del canvas */
+  width: auto !important;
+  height: auto !important;
+}
+
+
+
