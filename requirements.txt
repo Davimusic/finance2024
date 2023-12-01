@@ -7,7 +7,7 @@ brotlicffi==1.1.0.0
 cffi==1.16.0
 ConfigParser==6.0.0
 contextlib2==21.6.0
-ctypes_snappy==1.03
+//ctypes_snappy==1.03
 Cython==3.0.6
 dl==0.1.0
 docutils==0.20.1
