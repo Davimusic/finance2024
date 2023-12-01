@@ -5,6 +5,9 @@ from datetime import datetime
 import bcrypt # solo para el logeo ya que solo permite encriptar pero no desencriptar
 from cryptography.fernet import Fernet
 
+
+
+
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
 
@@ -14,7 +17,7 @@ app.secret_key = 'mi clave secreta'
 
 
 #conexcion a base de datos     
-myClient = pymongo.MongoClient("mongodb+srv://davis123:davis123@cluster0.hujqu.mongodb.net/test3")
+myClient = pymongo.MongoClient('mongodb+srv://davis123:davis123@cluster0.hujqu.mongodb.net/test3')
 myDb = myClient["contabilidadPublica"]#basde de datos
 myCollection=myDb["coleccion1"]#coleccion1
 
