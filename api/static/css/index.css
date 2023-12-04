@@ -28,7 +28,7 @@ p{
 }
 
 body{
-  background-image: url("https://res.cloudinary.com/dplncudbq/image/upload/v1670631081/mias/fondoConta_wlzfws.png");
+  background-image: url("https://res.cloudinary.com/dplncudbq/image/upload/v1692978372/mias/f1_npkojn.png");
 }
 
 .fondoTransparente{
@@ -163,19 +163,20 @@ button, .mano{
 }
 
 .color1{
-  background: #1d1717;
+  background: #16272A;
 }
 
 .color2{
-  background: #344d5a;
+  background: black;
 }
 
 .color3{
-  background: #85cddb;
+  background: #697376;
+ 
 }
 
 .color4{
-  background: rgb(68, 16, 102)
+  background: #80A0C2
 }
 
 .flex{

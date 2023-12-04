@@ -160,11 +160,15 @@ function retornarMotoresDeBusqueda(){
                 <input style="height: 25px;" value = "" class="borde1 color4" type="date" name="buscarFecha">
                 
             </div>
-            <button  style="background: none; border: none; height:40px; padding-top: 8px;" type="submit"><img id='motorBusqueda' onclick="rotar('motorBusqueda')" class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1671160860/mias/descarga_uomlyb.png" alt=""></button>    
+            <button  style="background: none; border: none; height:40px; padding-top: 8px;" type="submit"><img id='motorBusqueda' onclick="rotar('motorBusqueda')" class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="${retornarLinkBotonSelect()}" alt=""></button>    
         </div>
     </form>
     `
     return text;
+}
+
+function retornarLinkBotonSelect(){
+    return 'https://res.cloudinary.com/dplncudbq/image/upload/v1701543797/select_hkx3sf.png'
 }
 
 function traducirInfoDesdeBackend(inf){
@@ -249,7 +253,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
             </div>    
             <input style="width:100%;" value="${textoAdicional}" class="borde1 color4" type="text" name="texto" id="texto">
             
-            <button id="botonSubmit" onclick="desactivarBotonDespuesDeUsado('botonSubmit')" style="${marginInternos} background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1671160860/mias/descarga_uomlyb.png" alt=""></button>
+            <button id="botonSubmit" onclick="desactivarBotonDespuesDeUsado('botonSubmit')" style="${marginInternos} background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="${retornarLinkBotonSelect()}" alt=""></button>
         </form>  
     </div>`
 
