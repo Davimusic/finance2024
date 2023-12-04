@@ -82,6 +82,8 @@ def CRUD(accion, valorNum, ruta):
         for key in doc['usoDeReferencias']:
             for u in key.keys():
                 if desencriptarText(u) == referencia:
+                    print('desde editar')
+                    print(key[u])
                     key[u][int(codUnico)] = info
 
 
@@ -111,18 +113,17 @@ def retornarStringInformacion(arr, acc, idFiltrado):
         print('count')
         print(count)
         for key in u.keys():
+            count = 0  # Reinicia el contador para cada clave
             for user in u[key]:
-                print('desde user')
-                print(user)
                 info = ""
                 if acc == "negativo":
                     if int(user['dinero']) < 0:
-                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[count]}º" 
+                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º" 
                 elif acc == "positivo":
                     if int(user['dinero']) >= 0:
-                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[count]}º"
+                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º"
                 elif acc == "todos":
-                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[count]}º"               
+                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º"               
                 texto += info
                 count += 1
     print(f"texto: {texto}") 
@@ -169,62 +170,29 @@ def retornarInfoReferencia(valorNum):
     now = datetime.now()
     doc = myCollection.find_one({"email": session['email']})
     buscarInfo = []
-    ids = []
-    num = 0
+    ids = {}
 
     for item in doc['usoDeReferencias']:
         for llave in item.keys():
-            for fecha in item[llave]:
-                
+            for index, fecha in enumerate(item[llave]):
                 if f"{now.year}/{now.month}/{now.day}" == fecha['fechaDeCreacion']:
                     info = {desencriptarText(llave): [fecha]}
                     if info not in buscarInfo:
-                        ids.append(num)
+                        if desencriptarText(llave) not in ids:
+                            ids[desencriptarText(llave)] = []
+                        ids[desencriptarText(llave)].append(index)
                         buscarInfo.append(info)
-                num +=1
-                        
+
+    print('retornarInfoReferencia')
+    print(buscarInfo)   
+    print(ids)  
+
     textContenido = ""
     textContenido += retornarReferencias()
     textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)   
     return render_template('index.html', texto = textContenido)
 
 def retornarReferenciasDesglosadas():
-    '''
-    dicc = {}
-    nombresReferencias = myCollection.find({'nombresReferencias': {'$exists': True}})
-        
-    for i in nombresReferencias:
-        for u in i['nombresReferencias']:
-            referencias = myCollection.find({'referencia': u})
-            print('referencias')
-            print(referencias)
-            arr = ['@ingresos@', '@egresos@']
-            for q in arr:
-                for i in range(1, 13):
-                    num = ''
-                    if i <= 9:
-                        num = f'0{i}'
-                    else:
-                        num = i     
-                    dicc[f'{u}{q}{num}'] = 0           
-            for a in referencias:
-                mes = a['fecha'][5:7]
-                dinero = int(a['dinero'])
-                if dinero < 0:
-                    dicc[f'{u}@egresos@{mes}'] += int(a['dinero']) 
-                else:
-                    dicc[f'{u}@ingresos@{mes}'] += int(a['dinero'])  
-
-    text = f'{retornarReferencias()},'
-    for i in dicc:
-        #print(i)
-        #print(dicc[i])
-        text += f"{str(i)}@{str(dicc[i])}@,"
-    print('text')
-    print(text)    
-    return text
-    #return render_template('graficosAnual.html', meses = text)'''
-
     dicc = {}
     doc = myCollection.find_one({"email": session['email']})
     
@@ -322,7 +290,6 @@ def analizarSignosProhibidos(text, solo_numeros=False, solo_letras=False, caract
             return False
     return True
 
-
 def encriptarContrasena(text):
     bcryptPassword = text.encode('utf-8')  
     ashed_password = bcrypt.hashpw(bcryptPassword, bcrypt.gensalt()) 
@@ -341,37 +308,66 @@ def update(id, llave, valor):
     updateTask = {"$set":{llave: valor}}
     myCollection.update_one(query, updateTask)
 
-def buscar_informacion(referencia, fecha):
-    buscarInfo = []
+def buscar_informacion(referencia, fechaUsuario):
+    buscarInfo = {}
     doc = myCollection.find_one({"email": session['email']})
-    ids = []
-    num = 0
+    ids = {}
 
     for item in doc['usoDeReferencias']:
         for llave in item.keys():
-            for fecha in item[llave]:
-                if referencia and desencriptarText(llave) == referencia:
-                    buscarInfo = [{desencriptarText(llave): item[llave]}]
-                    ids.append(num)
-                elif fecha:
-                    for info in item[llave]:
-                        if info['fecha'] == cambiarValor('-', '/', fecha):
-                            for buscarItem in buscarInfo:
-                                if desencriptarText(llave) in buscarItem:
-                                    buscarItem[desencriptarText(llave)].append(info)
-                                    break
-                            else:
-                                buscarInfo.append({desencriptarText(llave): [info]})
-                                ids.append(num)
-                elif referencia and fecha:
-                    matching_items = [info for info in item[llave] if info['fecha'] == cambiarValor('-', '/', fecha)]
-                    if matching_items:
-                        buscarInfo.append({desencriptarText(llave): matching_items})
-                        ids.append(num)
-                num += 1
+            for index, info in enumerate(item[llave]):
+                if referencia and fechaUsuario:
+                    if (desencriptarText(llave) == referencia and info['fecha'] == cambiarValor('-', '/', fechaUsuario)):
+                        if desencriptarText(llave) not in buscarInfo:
+                            buscarInfo[desencriptarText(llave)] = []
+                        buscarInfo[desencriptarText(llave)].append(info)
+                        if desencriptarText(llave) not in ids:
+                            ids[desencriptarText(llave)] = []
+                        ids[desencriptarText(llave)].append(index)
+                elif referencia and desencriptarText(llave) == referencia:
+                    if desencriptarText(llave) not in buscarInfo:
+                        buscarInfo[desencriptarText(llave)] = []
+                    buscarInfo[desencriptarText(llave)].append(info)
+                    if desencriptarText(llave) not in ids:
+                        ids[desencriptarText(llave)] = []
+                    ids[desencriptarText(llave)].append(index)
+                elif fechaUsuario and info['fecha'] == cambiarValor('-', '/', fechaUsuario):
+                    if desencriptarText(llave) not in buscarInfo:
+                        buscarInfo[desencriptarText(llave)] = []
+                    buscarInfo[desencriptarText(llave)].append(info)
+                    if desencriptarText(llave) not in ids:
+                        ids[desencriptarText(llave)] = []
+                    ids[desencriptarText(llave)].append(index)
+
+    # Eliminar las referencias sin coincidencias
+    ids = {k: v for k, v in ids.items() if v}
+
+    print('buscarInfo mira')
+    print(buscarInfo)
+    print('ids')
+    print(ids)
 
 
-    texto = retornarReferencias() + retornarStringInformacion(buscarInfo, "todos", ids)
+
+    '''
+    'usoDeReferencias': {'referncia1': {{'fecha': 'hfhf',
+                                        'mas llaves': 'valores'},
+                                        {'fecha': 'hfhf',
+                                        'mas llaves': 'valores'},
+                                        {'fecha': 'hfhf',
+                                        'mas llaves': 'valores'}, este coor 2 de referncia1
+                                        {'fecha': 'hfhf',
+                                        'mas llaves': 'valores'}},
+                        'referncia2': {{'fecha': 'hfhf',
+                                        'mas llaves': 'valores'},
+                                        {'fecha': 'hfhf',
+                                        'mas llaves': 'valores'},
+                                        {'fecha': 'hfhf',
+                                        'mas llaves': 'valores'},
+                                        {'fecha': 'hfhf',
+                                        'mas llaves': 'valores'}}  este coor 3 de referncia2            
+    '''
+    texto = retornarReferencias() + retornarStringInformacion([buscarInfo], "todos", ids)
     if validacionLogeo('', '') ==  'si esta logeado':
         return render_template('index.html', texto = texto)
     else:
@@ -515,27 +511,6 @@ def filtroReferencia(dato):
             return filtroBuscar()
         else:
             return CRUD(accion, '', "/") 
-
-@app.route('/anotaciones', methods=["GET", "POST"])
-def anotaciones():
-
-    buscar = myCollection.find({'anotaciones': {'$exists': True}})
-    if request.method == "GET":
-        
-        texto = ""
-        for i in buscar:
-            texto += i['anotaciones']
-        #print(texto)    
-        return render_template('anotaciones.html', mensaje = str(texto))
-
-    else:
-        
-        for i in buscar:
-            id = i['_id']
-        anotaciones = request.form.get("anotaciones", '')
-        update(id, 'anotaciones', anotaciones)
-
-        return redirect('/anotaciones')
 
 @app.route('/salir')
 def salir():

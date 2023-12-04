@@ -12,18 +12,18 @@
 </head>
 <body onload="aviso('{{ mensaje }}')">
 
-    <div id = 'padre' style="justify-content: center; align-items: center; display: flex;"> 
+    <div id = 'padre' style="justify-content: center; align-items: center; display: flex;  justify-content: center; text-align: center;"> 
         <div class="color1 borde1 padding1 sombra" style="width: fit-content; height: fit-content;">
             <form method="post">
 
                 <div style="margin-bottom:10%;">
                     <label for="">Email</label>
                 </div> 
-                <input style="width:100%; margin-bottom:10%;" value="" class="borde1" type="usuario" name="email"  required>
+                <input style="width:100%; margin-bottom:10%;" value="" class="borde1 color4" type="usuario" name="email"  required>
                 <div style="margin-bottom:10%;">
                     <label for="">Contraseña</label>
                 </div> 
-                <input style="width:100%; margin-bottom:10%;" value="" class="borde1" type="password" name="contrasena"  required>
+                <input style="width:100%; margin-bottom:10%;" value="" class="borde1 color4" type="password" name="contrasena"  required>
                 
                 <div style="margin-bottom:10%;">
                     <label id="repetirContrasenaLabel" style="display: none;" for="">Repite la contraseña</label>
@@ -32,7 +32,7 @@
 
                 <input id="estadoLogeo" style="display: none;" value="existente" type="text" name="estadoLogeo" >
                 
-                <button style="background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" id="botonEditar" src="https://res.cloudinary.com/dplncudbq/image/upload/v1671160860/mias/descarga_uomlyb.png" alt=""></button>
+                <button style="background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" id="botonEditar" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701543797/select_hkx3sf.png" alt=""></button>
             
             </form> 
             <div style="display: block;">
@@ -71,7 +71,7 @@
         }
     }
 
-    let divPadre = document.getElementById('padre').style.paddingTop = `${((window.innerHeight/100)*20)}px`
+    //let divPadre = document.getElementById('padre').style.paddingTop = `${((window.innerHeight/100)*20)}px`
     
 </script>
 

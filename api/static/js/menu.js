@@ -1,4 +1,4 @@
-let arr = [['imagen', 'https://res.cloudinary.com/dplncudbq/image/upload/v1658015902/mias/i1_ndc8ga.png'],['/ingresos', 'Ingresos'],['/egresos', 'Egresos'], ['/vistaDeFlujoReferencias', 'flujos por referencias'], ['/vistaDeFlujoCompactado', 'flujos compactado'], ['/anotaciones', 'anotaciones'], ['/crudreferencias', 'manipular referencias'], ['/salir', '<a href="/salir"><img style="height: 40px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1672767743/mias/salir_eyzxfp.png" alt="" srcset=""></a>'], ['', '']]
+let arr = [['imagen', 'https://res.cloudinary.com/dplncudbq/image/upload/v1701542645/menu1_ui2fw4.png'],['/ingresos', 'Ingresos'],['/egresos', 'Egresos'], ['/vistaDeFlujoReferencias', 'Flujos por referencias'], ['/vistaDeFlujoCompactado', 'Flujos compactado'], ['/crudreferencias', 'Manipular referencias'], ['/salir', '<a href="/salir"><img style="height: 30px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701542718/logo1_vxrgve.png" alt="" srcset=""></a>'], ['', '']]
 //<img style="height: 25px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1657473822/mias/red-304573_xrlhrp.png" alt="" srcset="">
 
 function menu(){
@@ -37,7 +37,7 @@ function menu(){
                 `
             } else {
                 cod +=`    
-                <li class=''><img id="eventoMenuCelular" ${eventoMenuCelular} style="height: ${alturaMenu - 5}px;" class='mano efectoMenu borde1' src="${arr[i][1]}" alt="" ></li>
+                <li class=''><img id="eventoMenuCelular" ${eventoMenuCelular} style="height: ${alturaMenu}px;" class='mano efectoMenu borde1' src="${arr[i][1]}" alt="" ></li>
                 `
             }
         }
@@ -87,3 +87,4 @@ function mostrarTextoMenu(acc){
         }
     }
 }
+
