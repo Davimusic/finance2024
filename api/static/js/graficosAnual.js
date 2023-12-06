@@ -14,31 +14,33 @@ function retornarFiltroReferencias(arr){
     let flujo = ['ingresos', 'egresos']
 
     let text = `
-        <div style="${retornarDecicionResponsiva('padding-top:100px;', 'padding-top:80px;')} ${retornarDecicionResponsiva('display:block;', 'display:flex;')} justify-content: space-between; width: 85%; padding-right: 2%; padding-left: 2%; margin:0px auto;">`
-            if(path != '/vistaDeFlujoCompactado'){
-                text +=
-                `<div class="" style="margin-bottom:10px; padding-right: 2%;">
-                    <label for="">Referencia</label>
-                </div> 
-                <select onchange="refrescarGrafico('referencia', this.id, this.value)" style="height: 25px; width:100%;" class="borde1" id="selectGraficoReferencia">`
-                for (let u = 0; u < Referencia.length; u++) {
-                    text +=`<option value="${Referencia[u]}">${Referencia[u]}</option>`
-                }
-                text +=    
-                `
-                </select>`
-            } 
-                text += `
-                <div class="" style="margin-bottom:10px; padding-right: 2%; padding-left: 2%; ${retornarDecicionResponsiva('padding-top:10px;', '')}">
-                    <label for="">Flujo</label>
-                </div> 
-                <select onchange="refrescarGrafico('flujo', this.id, this.value)" style="height: 25px; width:100%;" class="borde1" id="selectGraficoFlujo">`
-                for (let u = 0; u < flujo.length; u++) {
-                    text +=`<option value="${flujo[u]}">${flujo[u]}</option>`
-                }
-                text +=    
-                `
-                </select> 
+        <div style="${retornarDecicionResponsiva('padding-top:100px;', 'padding-top:80px;')}">
+            <div style=" ${retornarDecicionResponsiva('display:block;', 'display:flex;')} justify-content: space-between; width: 85%; padding: 1%; margin:0px auto; background: #1312129a;" class="borde1">`
+                if(path != '/vistaDeFlujoCompactado'){
+                    text +=
+                    `<div class="" style="margin-bottom:10px; padding-right: 2%;">
+                        <label for="">Referencia</label>
+                    </div> 
+                    <select onchange="refrescarGrafico('referencia', this.id, this.value)" style="height: 25px; width:100%;" class="borde1 color4" id="selectGraficoReferencia">`
+                    for (let u = 0; u < Referencia.length; u++) {
+                        text +=`<option value="${Referencia[u]}">${Referencia[u]}</option>`
+                    }
+                    text +=    
+                    `
+                    </select>`
+                } 
+                    text += `
+                    <div class="" style="margin-bottom:10px; padding-right: 2%; padding-left: 2%; ${retornarDecicionResponsiva('padding-top:10px;', '')}">
+                        <label for="">Flujo</label>
+                    </div> 
+                    <select onchange="refrescarGrafico('flujo', this.id, this.value)" style="height: 25px; width:100%;" class="borde1 color4" id="selectGraficoFlujo">`
+                    for (let u = 0; u < flujo.length; u++) {
+                        text +=`<option value="${flujo[u]}">${flujo[u]}</option>`
+                    }
+                    text +=    
+                    `
+                    </select> 
+            </div>
         </div>
     ` 
     return text;
@@ -112,7 +114,7 @@ function crearGrafica(){
     let dicc = {'01':'enero', '02':'febrero', '03':'marzo', '04':'abril', '05':'mayo', '06':'junio', '07':'julio', '08':'agosto', '09':'septiembre', '10':'octubre', '11':'noviembre', '12':'diciembre'}
     let diccCompactoIngresos = {'enero': 0, 'febrero': 0, 'marzo': 0, 'abril': 0, 'mayo': 0, 'junio': 0, 'julio': 0, 'agosto': 0, 'septiembre': 0, 'octubre': 0, 'noviembre': 0, 'diciembre': 0}
     let diccCompactoEgresos = {'enero': 0, 'febrero': 0, 'marzo': 0, 'abril': 0, 'mayo': 0, 'junio': 0, 'julio': 0, 'agosto': 0, 'septiembre': 0, 'octubre': 0, 'noviembre': 0, 'diciembre': 0}
-    let labels = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviemre", "diciembre", 'ingresos', 'egresos', 'flujo actual']
+    let labels = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviemre", "Diciembre", 'ingresos', 'egresos', 'flujo actual']
     if(path == '/vistaDeFlujoReferencias'){
         for (let u = 0; u < arrContenido.length; u++) {
             if(arrContenido[u][0] == refenciaActual && arrContenido[u][1] == flujo){
@@ -199,7 +201,7 @@ function retornarDinerosEnPocentajes(arre){
     }
     //console.log(`max value : ${maxValue}`);
     for (let u = 0; u < arre.length; u++) {
-        let nuevoValor = (parseInt(arre[u]) * ((window.innerWidth / 100) * retornarDecicionResponsiva('42', '65')))/maxValue //42  el 200 y 400 el el maximo valor que declarè en el div que muestra el porcentaje
+        let nuevoValor = (parseInt(arre[u]) * ((window.innerWidth / 100) * retornarDecicionResponsiva('37', '60')))/maxValue //42  el 200 y 400 el el maximo valor que declarè en el div que muestra el porcentaje
         if(nuevoValor < 0){
             nuevoValor = -1 * nuevoValor
         }
@@ -227,12 +229,12 @@ function cambiarColor(id, color){
 
 function retornarBarrasEstadisticas(id, dineroBruto, mes){
     let cod = `
-    <div onmouseover="cambiarColor('padre${id}', '#0077B6')" onmouseout="cambiarColor('padre${id}', '#ffffff00')"  id='padre${id}' style="display:flex; margin-bottom: 0.5%; border-radius: 0.5em;">
-        <label style="width: 150px;" for="">${mes}</label>
+    <div onmouseover="cambiarColor('padre${id}', '#000000bd')" onmouseout="cambiarColor('padre${id}', '#ffffff00')"  id='padre${id}' style="display:flex; margin-bottom: 0.5%; border-radius: 0.5em;">
+        <label style="width: 150px; text-align: left;" for="">${mes}</label>
         <div style="width: ${((window.innerWidth / 100) * 70)}px;">
-            <div class="borde1" id='${id}' style="cursor: pointer; background:#3c8179; height: 20px;" ></div>
+            <div class="borde1 color3" id='${id}' style="cursor: pointer; height: 20px;" ></div>
         </div>
-        <label style="width: 100px; padding-left: 5%;" for="">${dineroBruto}</label>
+        <label style="width: 100px; padding-left: 5%;" for="">$${dineroBruto}</label>
     </div>`
     return cod
 } 
@@ -247,7 +249,7 @@ function generarAnimacionBarras(dinerosTraducidosParaPocentajes){
         let barra = document.getElementById(ba)
         barra.style.transition = '1000ms';
         barra.style.width = `0px`;
-        barra.style.background = '#0077B6';
+        barra.classList.add('color2');
     }
     setTimeout(correrBarras, 300)
 }
@@ -259,9 +261,10 @@ function correrBarras(){
         barra.style.transition = '3s';
         barra.style.width = `${copiaDinerosTraducidosParaPocentajes[u]}px`;
         if(flujo == 'egresos'){
-            barra.style.background = 'red';
+            barra.classList.add('color3');
         } else {
-            barra.style.background = '#3c8179';
+            barra.classList.remove('color3');
+            barra.classList.add('color2');
         }
     }
 }

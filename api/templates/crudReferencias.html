@@ -22,7 +22,7 @@ function a(texto, aviso){
     let cod = `
     ${menu()}
     <div id="componente" class="color1 borde1 padding1 sombra" style="margin-bottom:5%; margin:5%; margin-top:10%;"> 
-        <form method="post">
+        <form method="post" id='miFormulario'>
             <input style="display:none;" value = "crear" class="borde1 color4" type="text" name="formUso" id="formUso" required>
             
             <div style="margin-bottom:10px;">
@@ -75,7 +75,7 @@ function a(texto, aviso){
                 </select>
             </div> 
             
-            <button  style=" background: none; border: none; height:40px; padding-top: 5%;" type="submit"><img onclick="rotar('botonEditar')" class="efectoMenu" style="height:40px; border-radius:50%; background: white;" id="botonEditar" src="'https://res.cloudinary.com/dplncudbq/image/upload/v1701543797/select_hkx3sf.png'" alt=""></button>
+            <button id='botonForm'  style=" background: none; border: none; height:40px; padding-top: 5%;" type="submit"><img onclick="rotar('botonEditar')" class="efectoMenu" style="height:40px; border-radius:50%; background: white;" id="botonEditar" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701543797/select_hkx3sf.png" alt=""></button>
         </form>  
     </div>`
     document.getElementById("padreMenu").innerHTML = cod;
@@ -83,7 +83,6 @@ function a(texto, aviso){
         alert(aviso)
     }
 }
-
 
 function verificarContenidoArreglo(arr, accSiEstaVacio, accSiNoEstaVacio){
     let text = ''

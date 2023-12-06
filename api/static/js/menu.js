@@ -1,4 +1,4 @@
-let arr = [['imagen', 'https://res.cloudinary.com/dplncudbq/image/upload/v1701542645/menu1_ui2fw4.png'],['/ingresos', 'Ingresos'],['/egresos', 'Egresos'], ['/vistaDeFlujoReferencias', 'Flujos por referencias'], ['/vistaDeFlujoCompactado', 'Flujos compactado'], ['/crudreferencias', 'Manipular referencias'], ['/salir', '<a href="/salir"><img style="height: 30px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701542718/logo1_vxrgve.png" alt="" srcset=""></a>'], ['', '']]
+let arr = [['imagen', 'https://res.cloudinary.com/dplncudbq/image/upload/v1701542645/menu1_ui2fw4.png'],['/ingresos', 'Ingresos'],['/egresos', 'Egresos'], ['/vistaDeFlujoReferencias', 'Flujos por referencias'], ['/vistaDeFlujoCompactado', 'Flujos compactado'], ['/crudreferencias', 'Manipular referencias'], ['/salir', '<a href="/salir"><img style="height: 40px; padding: 5px; background: white; border-radius: 50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701542718/logo1_vxrgve.png" alt="" srcset=""></a>'], ['', '']]
 //<img style="height: 25px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1657473822/mias/red-304573_xrlhrp.png" alt="" srcset="">
 
 function menu(){
@@ -23,7 +23,7 @@ function menu(){
     
     cod += 
     `
-    <div id="menuDesplegable" style="margin: none; ${anchoAUsar}   background-image: url('https://res.cloudinary.com/dplncudbq/image/upload/v1670631081/mias/fondoConta_wlzfws.png');"  class="sticky sobresalir contenedorGaleria flex">
+    <div id="menuDesplegable" style="margin: none; ${anchoAUsar} background-repeat: no-repeat; background-size: cover; background-image: url('https://res.cloudinary.com/dplncudbq/image/upload/v1692978372/mias/f1_npkojn.png');"  class="sticky sobresalir contenedorGaleria flex">
         <ul class="${display} espacioEquilatero ListaLimpia">
     `
         for (let i = 0; i < arr.length; i++) {
@@ -37,7 +37,7 @@ function menu(){
                 `
             } else {
                 cod +=`    
-                <li class=''><img id="eventoMenuCelular" ${eventoMenuCelular} style="height: ${alturaMenu}px;" class='mano efectoMenu borde1' src="${arr[i][1]}" alt="" ></li>
+                <li class=''><img id="eventoMenuCelular" ${eventoMenuCelular} style="height: 40px; background: white; border-radius: 50%;" class='mano efectoMenu' src="${arr[i][1]}" alt="" ></li>
                 `
             }
         }

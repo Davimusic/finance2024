@@ -5,16 +5,11 @@ from datetime import datetime
 import bcrypt # solo para el logeo ya que solo permite encriptar pero no desencriptar
 from cryptography.fernet import Fernet
 
-
-
-
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
 
-
 app = Flask(__name__)
 app.secret_key = 'mi clave secreta'
-
 
 #conexcion a base de datos     
 myClient = pymongo.MongoClient('mongodb+srv://davis123:davis123@cluster0.hujqu.mongodb.net/test3')
@@ -32,9 +27,7 @@ def cambiarValor(busca, cambia, text):
     return tex
 
 def CRUD(accion, valorNum, ruta):
-    print('desde crud')
-    print(accion)
-
+    
     if valorNum == "negativo":
         dinero =  retornarNumeroNegativo(int(request.form.get("dinero", '')))
     else:
@@ -45,13 +38,14 @@ def CRUD(accion, valorNum, ruta):
     texto = request.form.get("texto", '')
     codUnico = request.form.get("codUnico", '')
     signoNumerico = request.form.get("signoNumerico", '')
-
-    print('codUnico')
-    print(codUnico)
+    rutActual = request.form.get("rutActual", '')
 
     doc = myCollection.find_one({"email": session['email']})
     paso = doc['usoDeReferencias']
     now = datetime.now()
+
+    if analizarSignosProhibidos(texto, solo_numeros=False, solo_letras=False, caracteres_permitidos= [' ', '.', ',', '-'], caracteres_prohibidos= ["'", '"', '`']) == False:
+        return render_template('logeo.html', mensaje = 'No puedes algun tipo de comilla para textos usar solo puedes ingresar números y letras en "Texto adicional" información no guardada')
 
     if(accion == "crear"):
 
@@ -77,16 +71,14 @@ def CRUD(accion, valorNum, ruta):
         else:
             dinero = retornarNumeroPositivo(int(dinero))
 
-        info = {"dinero": dinero, "fecha": fecha, "texto": cambiarValor(',', '-', texto), "fechaDeCreacion": f"{now.year}/{now.month}/{now.day}"}
+        info = {"dinero": dinero, "fecha": fecha, "texto": cambiarValor(',', '-', texto), "fechaDeCreacion": ''}
 
         for key in doc['usoDeReferencias']:
             for u in key.keys():
                 if desencriptarText(u) == referencia:
-                    print('desde editar')
-                    print(key[u])
+                    fechaCreacionOriginal = key[u][int(codUnico)]['fechaDeCreacion']
                     key[u][int(codUnico)] = info
-
-
+                    key[u][int(codUnico)]['fechaDeCreacion'] = fechaCreacionOriginal
 
     elif(accion == "borrar"):
 
@@ -99,19 +91,17 @@ def CRUD(accion, valorNum, ruta):
     updateTask = {"$set":{'usoDeReferencias': paso}}
     myCollection.update_one({"_id": doc['_id']}, updateTask)                
 
-    return redirect(ruta)    
+    try:
+        rutActual
+        return redirect(rutActual)
+    except NameError:
+        return redirect(ruta)  
 
 def retornarStringInformacion(arr, acc, idFiltrado):
-    print('retornarStringInformacion arr')
-    print(arr)
-    print('idFiltrado')
-    print(idFiltrado)
 
     texto = ""
     count = 0
     for u in arr:
-        print('count')
-        print(count)
         for key in u.keys():
             count = 0  # Reinicia el contador para cada clave
             for user in u[key]:
@@ -126,7 +116,7 @@ def retornarStringInformacion(arr, acc, idFiltrado):
                         info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º"               
                 texto += info
                 count += 1
-    print(f"texto: {texto}") 
+    #print(f"texto: {texto}") 
     return texto 
 
 def retornarSigoNumerico(num):
@@ -183,10 +173,6 @@ def retornarInfoReferencia(valorNum):
                         ids[desencriptarText(llave)].append(index)
                         buscarInfo.append(info)
 
-    print('retornarInfoReferencia')
-    print(buscarInfo)   
-    print(ids)  
-
     textContenido = ""
     textContenido += retornarReferencias()
     textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)   
@@ -199,8 +185,8 @@ def retornarReferenciasDesglosadas():
     for ref in doc['usoDeReferencias']:
         for u, referencias in ref.items():
             decrypted_u = desencriptarText(u)  # Decrypt the reference name
-            print('referencias')
-            print(referencias)
+            #print('referencias')
+            #print(referencias)
             arr = ['@ingresos@', '@egresos@']
             for q in arr:
                 for i in range(1, 13):
@@ -220,9 +206,7 @@ def retornarReferenciasDesglosadas():
 
     text = f'{retornarReferencias()},'
     for i in dicc:
-        text += f"{str(i)}@{str(dicc[i])}@,"
-    print('text')
-    print(text)    
+        text += f"{str(i)}@{str(dicc[i])}@,"    
     return text
 
 def validacionLogeo(siLograLogear,siNoLogralogear):
@@ -342,31 +326,6 @@ def buscar_informacion(referencia, fechaUsuario):
     # Eliminar las referencias sin coincidencias
     ids = {k: v for k, v in ids.items() if v}
 
-    print('buscarInfo mira')
-    print(buscarInfo)
-    print('ids')
-    print(ids)
-
-
-
-    '''
-    'usoDeReferencias': {'referncia1': {{'fecha': 'hfhf',
-                                        'mas llaves': 'valores'},
-                                        {'fecha': 'hfhf',
-                                        'mas llaves': 'valores'},
-                                        {'fecha': 'hfhf',
-                                        'mas llaves': 'valores'}, este coor 2 de referncia1
-                                        {'fecha': 'hfhf',
-                                        'mas llaves': 'valores'}},
-                        'referncia2': {{'fecha': 'hfhf',
-                                        'mas llaves': 'valores'},
-                                        {'fecha': 'hfhf',
-                                        'mas llaves': 'valores'},
-                                        {'fecha': 'hfhf',
-                                        'mas llaves': 'valores'},
-                                        {'fecha': 'hfhf',
-                                        'mas llaves': 'valores'}}  este coor 3 de referncia2            
-    '''
     texto = retornarReferencias() + retornarStringInformacion([buscarInfo], "todos", ids)
     if validacionLogeo('', '') ==  'si esta logeado':
         return render_template('index.html', texto = texto)
@@ -501,12 +460,13 @@ def filtroReferencia(dato):
         return redirect('/ingresos')   
 
     if request.method == "GET":
-
+        
         return buscar_informacion(referencia, fecha)
         
     else:
 
         accion = request.form["formUso"]
+
         if accion == "filtroBuscar":
             return filtroBuscar()
         else:

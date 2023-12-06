@@ -54,7 +54,7 @@ function modal(contenido, titulo){
 	
 	cod = `
 	<div class='borde1' style = "text-align: center; background: #ffffff91; backdrop-filter: blur(5px); display: none; padding: 2%; opacity: 0; height: 0px" id="modala">
-		<header class='borde1' style = "position: sticky; top: 0; padding: 2%; background: #3c8179; display:flex; justify-content: space-between;">
+		<header class='borde1 color1' style = "position: sticky; top: 0; padding: 2%; display:flex; justify-content: space-between;">
 			<div style="display:flex; justify-content: space-between;">
 				<div> ${titulo} </div>
 			</div>

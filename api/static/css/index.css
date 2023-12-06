@@ -9,6 +9,7 @@ div, select, textarea {
   scrollbar-width: none;  /* Firefox */
 }
 
+
 p{
   margin: 0;
 }
@@ -18,7 +19,7 @@ p{
 }
 
 .efectoMenu:hover{
-  background-color: #3c8179;
+  background-color: #1312129a;
   -webkit-box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.44); 
   box-shadow: 5px 5px 15px 5px rgba(0,0,0,0.44);
 }
@@ -27,8 +28,10 @@ p{
   text-align: center;
 }
 
-body{
+body {
   background-image: url("https://res.cloudinary.com/dplncudbq/image/upload/v1692978372/mias/f1_npkojn.png");
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .fondoTransparente{
@@ -121,6 +124,7 @@ input, select{
 
 textarea{
   resize: none;
+  background-color: #000000bd;
 }
 
 button, .mano{
@@ -176,7 +180,7 @@ button, .mano{
 }
 
 .color4{
-  background: #80A0C2
+  background: #1e2c3a
 }
 
 .flex{

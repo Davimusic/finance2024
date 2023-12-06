@@ -2,7 +2,7 @@ let Referencia = []
 let marginInternos = "margin-top:30px; margin-bottom:10px;"
 let altoPantalla = window.innerHeight;
 
-let diColores = {'color1': 'black', 'color2': 'purple', 'color3': 'green'}
+//let diColores = {'color1': 'black', 'color2': 'purple', 'color3': 'green'}
 
 function arranque(inf){
     Referencia = ordenarAlfaNumerico(retornarReferencias(inf))
@@ -28,11 +28,18 @@ function arranque(inf){
 }
 
 function retornarComponentePorIngresoEgreso(positivo, negativo){
-    if(window.location.pathname == '/ingresos' || window.location.pathname == '/egresos' ){
+    if(positivo != ''){
         return positivo
     } else {
         return negativo
     }
+    /** 
+    if(window.location.pathname == '/ingresos' || window.location.pathname == '/egresos' ){
+        return positivo
+    } else {
+        return negativo
+    }*/
+
 }
 
 function reemplazarCaracter(busca, cambia, cadena){
@@ -73,11 +80,11 @@ function retornarInterfasIngresoDeInformacionJuntoContabla(inf){
     }
 
     arr[1] = invertirArreglo(arr[1])
-    
+
     let text = `
-    <div class="borde1 sombra" style=" width:100%; ${retornarDecicionResponsiva("","margin-left:5%;")} ${retornarComponentePorIngresoEgreso('', retornarDecicionResponsiva('margin-top: 40px;', 'margin-top: 20px;'))}">
+    <div class="borde1 sombra" style=" width:100%; ${retornarDecicionResponsiva("","margin-left:5%;")} ${retornarComponentePorIngresoEgreso('', retornarDecicionResponsiva('margin-top: 40px;', ''))}">
         ${retornarMotoresDeBusqueda()}
-        <div class="color1" style="height: ${(altoPantalla/100)*67.5}px; overflow: scroll; ${retornarComponentePorIngresoEgreso('', 'border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em;')}">  
+        <div class="color1" style="height: ${(altoPantalla/100)*67.5}px; overflow: scroll;">  
             <table class="color1 padding1" style="padding-top: 2%; width:100%;">
                 <tr class="color2" style="position: sticky; top:0;">
         `
@@ -104,7 +111,7 @@ function retornarInterfasIngresoDeInformacionJuntoContabla(inf){
             text+=`<td>${arr[1][u][e]}</td>`
         } 
 
-        totalIngresoDia += parseInt(arr[1][u][1])
+        //totalIngresoDia += parseInt(arr[1][u][1])
 
         let mirar = `editar${u}`
         let idBorrar = `borrar${u}`
@@ -114,8 +121,8 @@ function retornarInterfasIngresoDeInformacionJuntoContabla(inf){
         let infoBorrar = "`" + arr[1][u] + "," + tituloBorrar + "`"  
 
         text +=`    <td style="justify-content: space-around; display:flex;">
-                        <img id="${mirar}" onclick="eventoUnico('${mirar}', 'botonEditarTabla(${infoEditar})')" class="efectoMenu mano" style="height:40px; border-radius:50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1669597779/editar_mfk2bi.png" alt="">
-                        <img id="${idBorrar}" onclick="eventoUnico('${idBorrar}', 'botonEditarTabla(${infoBorrar})')" class="efectoMenu mano" style="height:40px; border-radius:50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1669597775/borrar_yw19rd.png" alt="">
+                        <img id="${mirar}" onclick="eventoUnico('${mirar}', 'botonEditarTabla(${infoEditar})')" class="efectoMenu mano" style="height:30px; border-radius:50%; background: white; padding: 5px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701787300/edit_cdqnpt.png" alt="">
+                        <img id="${idBorrar}" onclick="eventoUnico('${idBorrar}', 'botonEditarTabla(${infoBorrar})')" class="efectoMenu mano" style="height:30px; border-radius:50%; background: white; padding: 5px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701787300/trash_cq9i3d.png" alt="">
                     </td>
                 </tr>`                
         }
@@ -126,15 +133,58 @@ function retornarInterfasIngresoDeInformacionJuntoContabla(inf){
         var month = today.getMonth() + 1;
         var year = today.getFullYear();
         const ruta = window.location.pathname.slice(1);
-        const ajustadoTotalIngresoDia = totalIngresoDia < 0 ? totalIngresoDia.toString().slice(1) : totalIngresoDia.toString();
+        //const ajustadoTotalIngresoDia = totalIngresoDia < 0 ? totalIngresoDia.toString().slice(1) : totalIngresoDia.toString();
         
         
         text+= `
             </table>
         </div>
-        ${retornarComponentePorIngresoEgreso(`<div class="color2" style='padding: 10px; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em;'>total ${ruta} anotados el ${month}/${day}/${year}: ${ajustadoTotalIngresoDia}</div>`, '')}
+        ${retornarComponentePorIngresoEgreso(`<div class="color2" style='padding: 10px; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em;'>${generarTexto(ruta, arr[1])}</div>`, '')}
     </div>`
     return text;
+}
+
+function generarTexto(parametro, arrDinero) {
+    var today = new Date();
+    var day = today.getDate();
+    var month = today.getMonth() + 1;
+    var year = today.getFullYear();
+    let arrDineros = []
+    for (let u = 0; u < arrDinero.length; u++) {
+        arrDineros.push(parseInt(arrDinero[u][1]))
+    }
+
+    if (parametro === 'ingresos' || parametro === 'egresos') {
+        let dinero = 0;
+        if(parametro === 'ingresos'){
+            dinero = procesarNumeros(arrDineros, 'sumaPositivosNegativos')[0]
+        } else {
+            dinero = procesarNumeros(arrDineros, 'sumaPositivosNegativos')[1]
+        }
+        return `Total ${parametro} anotados el ${month}/${day}/${year}: $${dinero}`
+    } else {
+        var palabras = parametro.split('Z');
+        if(palabras[1].length != 0){
+            return `Total ${palabras[0]} anotados el ${palabras[1]}: $${procesarNumeros(arrDineros, 'sumaAbsoluta')}, total ingresos: $${procesarNumeros(arrDineros, 'sumaPositivosNegativos')[0]}, total egresos: $${procesarNumeros(arrDineros, 'sumaPositivosNegativos')[1]}, total dinero disponible neto: $${procesarNumeros(arrDineros, 'sumaNormal')}`
+        } else {
+            return `Total anotados de la referencia ${palabras[0]}: $${procesarNumeros(arrDineros, 'sumaAbsoluta')}`
+        }
+    }
+}
+
+function procesarNumeros(arr, opcion) {
+    switch(opcion) {
+        case 'sumaAbsoluta':
+            return arr.reduce((a, b) => a + Math.abs(b), 0);
+        case 'sumaNormal':
+            return arr.reduce((a, b) => a + b, 0);
+        case 'sumaPositivosNegativos':
+            let sumaPositivos = arr.filter(n => n > 0).reduce((a, b) => a + b, 0);
+            let sumaNegativos = arr.filter(n => n < 0).reduce((a, b) => a + b, 0);
+            return [sumaPositivos, sumaNegativos];
+        default:
+            return 'Opción no válida';
+    }
 }
 
 function retornarMotoresDeBusqueda(){
@@ -192,6 +242,7 @@ function traducirInfoDesdeBackend(inf){
 
 function botonEditarTabla(codigo){
     let arr = codigo.split(',');
+    console.log('botonEditarTabla');
     console.log(arr);
     let text = ""  
     let accion = ""
@@ -199,9 +250,12 @@ function botonEditarTabla(codigo){
         accion = "editar"
     } else {
         accion = "borrar"
-    }              
+    }   
+    console.log(arr[6]);           
     console.log(accion);                                                                                                            
-    text =   retornarComponente("", "margin-top:30px; margin-bottom:10px;", arr[0], arr[1], reemplazarCaracter("/", "-", arr[2]), arr[3], accion, arr[5], arr[4])
+    text =   retornarComponente("", "margin-top:30px; margin-bottom:10px;", arr[0], arr[1], reemplazarCaracter("/", "-", arr[2]), arr[3], accion, arr[5], arr[4], 'para modal', window.location.pathname)
+    console.log('text');
+    console.log(text);
     actualizarBloqueEnUso("editar contenido modal")
     ActivarModal(text, arr[6])
 }
@@ -216,46 +270,52 @@ function retornarDecicionResponsiva(celular, desdeTablet){
     }
 }
                                                                                                         
-function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, textoAdicional, formUso, codigoUnico, signoNumerico){
-    let cod = `
-    <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; max-height:380px; ${accion2} ${retornarDecicionResponsiva('margin-top: 10%;', '')}"> 
-        <form method="post">
-            <input style="display:none;" value = "${formUso}" class="borde1 color4" type="text" name="formUso" id="formUso" required>
-            <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>
-            <input style="display:none;" value = "${signoNumerico}" class="borde1 color4" type="text" name="signoNumerico" required>
-            <div style="margin-bottom:10px;">
-                <label for="">Referencia</label>
-            </div> 
-            <select style="width:100%;" class="borde1 color4" name="referencia" id="referencia" required>`
-            for (let u = 0; u < Referencia.length; u++) {
-                let seleccionar = ""
-                //console.log(`referencia: ${referencia}, Referencia[u]: ${Referencia[u]}`);
-                if(referencia == Referencia[u]){
-                    seleccionar = "selected"
+function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, textoAdicional, formUso, codigoUnico, signoNumerico, uso, ruta){
+    let cod = ''
+    console.log(`accion2: ${accion2}, marginInternos: ${marginInternos}, referencia: ${referencia}, dinero: ${dinero}, fecha: ${fecha}, textoAdicional: ${textoAdicional}, formUso: ${formUso}, codigoUnico: ${codigoUnico}, signoNumerico: ${signoNumerico}`);
+
+    if(window.location.pathname === '/ingresos'  || window.location.pathname === '/egresos' || uso === 'para modal'){
+        cod = `
+        <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; max-height:380px; ${accion2} ${retornarDecicionResponsiva('margin-top: 10%;', '')}"> 
+            <form method="post">
+                <input style="display:none;" value = "${formUso}" class="borde1 color4" type="text" name="formUso" id="formUso" required>
+                <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>
+                <input style="display:none;" value = "${signoNumerico}" class="borde1 color4" type="text" name="signoNumerico" required>
+                <input style="display:none;" value = "${ruta}" type="text" name="rutActual">
+                <div style="margin-bottom:10px;">
+                    <label for="">Referencia</label>
+                </div> 
+                <select style="width:100%;" class="borde1 color4" name="referencia" id="referencia" required>`
+                for (let u = 0; u < Referencia.length; u++) {
+                    let seleccionar = ""
+                    //console.log(`referencia: ${referencia}, Referencia[u]: ${Referencia[u]}`);
+                    if(referencia == Referencia[u]){
+                        seleccionar = "selected"
+                    }
+                cod +=`<option ${seleccionar} value="${Referencia[u]}">${Referencia[u]}</option>`
                 }
-            cod +=`<option ${seleccionar} value="${Referencia[u]}">${Referencia[u]}</option>`
-            }
-            cod +=    
-            `
-            </select>
-            <div style="${marginInternos}">
-                <label for="">Ingreso de dinero</label>
-            </div>    
-            <input style="width:100%;" value="${dinero}" class="borde1 color4" type="number" name="dinero" id="dinero" required> 
-            
-            <div style="${marginInternos}">
-                <label for="">Fecha a ingresar</label>
-            </div>    
-            <input style="width:100%;" value = "${fecha}" class="borde1 color4" type="date" name="fecha" id="fecha" required>
-            
-            <div style="${marginInternos}">
-                <label for="">Texto adicional</label>
-            </div>    
-            <input style="width:100%;" value="${textoAdicional}" class="borde1 color4" type="text" name="texto" id="texto">
-            
-            <button id="botonSubmit" onclick="desactivarBotonDespuesDeUsado('botonSubmit')" style="${marginInternos} background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="${retornarLinkBotonSelect()}" alt=""></button>
-        </form>  
-    </div>`
+                cod +=    
+                `
+                </select>
+                <div style="${marginInternos}">
+                    <label for="">Ingreso de dinero</label>
+                </div>    
+                <input style="width:100%;" value="${dinero}" class="borde1 color4" type="number" name="dinero" id="dinero" required> 
+                
+                <div style="${marginInternos}">
+                    <label for="">Fecha a ingresar</label>
+                </div>    
+                <input style="width:100%;" value = "${fecha}" class="borde1 color4" type="date" name="fecha" id="fecha" required>
+                
+                <div style="${marginInternos}">
+                    <label for="">Texto adicional</label>
+                </div>    
+                <input style="width:100%;" value="${textoAdicional}" class="borde1 color4" type="text" name="texto" id="texto">
+                
+                <button id="botonSubmit" onclick="desactivarBotonDespuesDeUsado('botonSubmit')" style="${marginInternos} background: none; border: none; height:40px;" type="submit"><img id='botonSubmitImage' onclick="rotar('botonSubmitImage')" class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="${retornarLinkBotonSelect()}" alt=""></button>
+            </form>  
+        </div>`
+    }
 
     return cod;
 }

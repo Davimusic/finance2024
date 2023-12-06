@@ -12,35 +12,30 @@
 </head>
 <body onload="aviso('{{ mensaje }}')">
 
-    <div id = 'padre' style="justify-content: center; align-items: center; display: flex;  justify-content: center; text-align: center;"> 
-        <div class="color1 borde1 padding1 sombra" style="width: fit-content; height: fit-content;">
-            <form method="post">
-
-                <div style="margin-bottom:10%;">
-                    <label for="">Email</label>
+    <div id='padre' style='display: flex; justify-content: center; align-items: center; height: 100vh;'>
+        <div class='color1 borde1 padding1 sombra' style='width: fit-content; height: fit-content;'>
+            <form method='post'>
+                <div style='margin-bottom:10%;'>
+                    <label for=''>Email</label>
                 </div> 
-                <input style="width:100%; margin-bottom:10%;" value="" class="borde1 color4" type="usuario" name="email"  required>
-                <div style="margin-bottom:10%;">
-                    <label for="">Contraseña</label>
+                <input style='width:100%; margin-bottom:10%;' value='' class='borde1 color4' type='usuario' name='email' required>
+                <div style='margin-bottom:10%;'>
+                    <label for=''>Contraseña</label>
                 </div> 
-                <input style="width:100%; margin-bottom:10%;" value="" class="borde1 color4" type="password" name="contrasena"  required>
-                
-                <div style="margin-bottom:10%;">
-                    <label id="repetirContrasenaLabel" style="display: none;" for="">Repite la contraseña</label>
+                <input style='width:100%; margin-bottom:10%;' value='' class='borde1 color4' type='password' name='contrasena' required>
+                <div style='margin-bottom:10%;'>
+                    <label id='repetirContrasenaLabel' style='display: none;' for=''>Repite la contraseña</label>
                 </div> 
-                <input id="repetirContrasenaInput" style="width:100%; margin-bottom:10%; display: none;" value="" class="borde1" type="password" name="contrasenaComparar" >
-
-                <input id="estadoLogeo" style="display: none;" value="existente" type="text" name="estadoLogeo" >
-                
-                <button style="background: none; border: none; height:40px;" type="submit"><img class="efectoMenu" style="background: white; height:40px; border-radius:50%;" id="botonEditar" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701543797/select_hkx3sf.png" alt=""></button>
-            
+                <input id='repetirContrasenaInput' style='width:100%; margin-bottom:10%; display: none;' value='' class='borde1 color4' type='password' name='contrasenaComparar'>
+                <input id='estadoLogeo' style='display: none;' value='existente' type='text' name='estadoLogeo'>
+                <button style='background: none; border: none; height:40px;' type='submit'><img class='efectoMenu' style='background: white; height:40px; border-radius:50%;' id='botonEditar' src='https://res.cloudinary.com/dplncudbq/image/upload/v1701543797/select_hkx3sf.png' alt=''></button>
             </form> 
-            <div style="display: block;">
-                <div onclick="opcionLogeo('nuevo')" style="cursor: pointer;">
-                    <label for="">crear nueva cuenta</label>
+            <div style='display: block;'>
+                <div onclick="opcionLogeo('nuevo')" style='cursor: pointer;'>
+                    <label for=''>crear nueva cuenta</label>
                 </div>
-                <div onclick="opcionLogeo('existente')" style="cursor: pointer;">
-                    <label for="">Logear usuario existente</label>
+                <div onclick="opcionLogeo('existente')" style='cursor: pointer;'>
+                    <label for=''>Logear usuario existente</label>
                 </div>
             </div>
         </div>    
@@ -66,7 +61,13 @@
     }
 
     function aviso(mensaje){
-        if(mensaje != ''){
+        if(mensaje === 'No puedes algun tipo de comilla para textos usar solo puedes ingresar números y letras en "Texto adicional" información no guardada'){
+                const padre = document.getElementById('padre')
+                padre.style.backgroundColor = 'black'
+                padre.innerHTML = ''
+                window.location.href = "/ingresos";
+                setTimeout(function() { alert(mensaje) }, 200);
+        } else if(mensaje != ''){
             alert(mensaje)
         }
     }
