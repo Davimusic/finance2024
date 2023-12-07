@@ -2,16 +2,14 @@ let Referencia = []
 let marginInternos = "margin-top:30px; margin-bottom:10px;"
 let altoPantalla = window.innerHeight;
 
-//let diColores = {'color1': 'black', 'color2': 'purple', 'color3': 'green'}
-
 function arranque(inf){
     Referencia = ordenarAlfaNumerico(retornarReferencias(inf))
     let code = ``
     code += `
     ${menu()}
-    <div id="padre" style="margin: 3%; position:relative; ${heightPantalla()}">
-        <div id="porAhora" style="position: absolute; width:100%;">
-            <div style="${retornarDecicionResponsiva('display:block;','display:flex;')} margin-top:2%; width:100%">` 
+    <div id="padre" style="margin: 3%; position:relative; ${heightPantalla()};">
+        <div id="porAhora" style="position: absolute; width:100%; margin-top: 2%; overflow-y: auto; height: ${Math.floor((window.innerHeight / 100) * 90)}px;">
+            <div style="${retornarDecicionResponsiva('display:block;','display:flex;')} width:100%">` 
 
         code += retornarComponentePorIngresoEgreso(`${retornarComponente(retornarDecicionResponsiva('width:96%;',''), marginInternos,"pedro", "", "", "", "crear","sin valor")}`, '')    
             
@@ -82,7 +80,7 @@ function retornarInterfasIngresoDeInformacionJuntoContabla(inf){
     arr[1] = invertirArreglo(arr[1])
 
     let text = `
-    <div class="borde1 sombra" style=" width:100%; ${retornarDecicionResponsiva("","margin-left:5%;")} ${retornarComponentePorIngresoEgreso('', retornarDecicionResponsiva('margin-top: 40px;', ''))}">
+    <div class="borde1 sombra" style=" width:100%; ${espacio(retornarDecicionResponsiva("","margin-left:5%;"))} ${retornarComponentePorIngresoEgreso('', retornarDecicionResponsiva('margin-top: 40px;',''))}">
         ${retornarMotoresDeBusqueda()}
         <div class="color1" style="height: ${(altoPantalla/100)*67.5}px; overflow: scroll;">  
             <table class="color1 padding1" style="padding-top: 2%; width:100%;">
@@ -142,6 +140,10 @@ function retornarInterfasIngresoDeInformacionJuntoContabla(inf){
         ${retornarComponentePorIngresoEgreso(`<div class="color2" style='padding: 10px; border-bottom-left-radius: 0.5em; border-bottom-right-radius: 0.5em;'>${generarTexto(ruta, arr[1])}</div>`, '')}
     </div>`
     return text;
+}
+
+function espacio(acc){
+    return (window.location.pathname === '/ingresos' || window.location.pathname === '/egresos') ? acc : '';
 }
 
 function generarTexto(parametro, arrDinero) {

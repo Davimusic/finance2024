@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css' ) }}">
     <title>Anotaciones</title>
 </head>
-<body onload="arranque('{{ texto }} {{ alerta }}')">
+<body onload="arranque('{{ texto }}')">
     <div id="cs"></div>
     <div id="padreMenu" style="overflow: hidden; height: 40px; overflow-y: auto;"></div>
 </body>
@@ -18,9 +18,6 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/arranque.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/menu.js') }}"></script>
-
 <script type="text/javascript" src="{{ url_for('static', filename='js/graficosAnual.js') }}"></script>
-
-
 
 </html>
