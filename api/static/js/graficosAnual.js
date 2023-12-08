@@ -47,6 +47,7 @@ function retornarFiltroReferencias(arr){
 }
 
 function refrescarGrafico(acc, id, val){
+    console.log(`refrescarGrafico`);
     console.log(`acc: ${acc},  id: ${id},  val: ${val}`);
     
     let select = document.getElementById(id)
@@ -68,6 +69,8 @@ function actualizarValorSlide(id, valor){
     for (const key in diccFlitros) {
         document.getElementById(key).value = diccFlitros[key];
     }
+    console.log('actualizarValorSlide');
+    console.log(`id: ${id}, valor: ${valor}`);
     console.log(diccFlitros)
 }
 
@@ -168,7 +171,7 @@ function crearGrafica(){
     `
     ${menu()}
     ${retornarFiltroReferencias(arrReferencias)}
-    <div style="text-align: center; justify-content: center; width: 100%; height: ${((window.innerHeight / 100) * 90)}px; ${retornarDecicionResponsiva('padding-top: 3%;', 'padding-top: 2%;')} overflow-x: auto; margin:0px auto;">
+    <div id="contenido" style="text-align: center; justify-content: center; width: 100%; height: ${((window.innerHeight / 100) * 90)}px; ${retornarDecicionResponsiva('padding-top: 3%;', 'padding-top: 2%;')} overflow-x: auto; margin:0px auto;">
         <div class="borde1 padding1 sombra" style="margin-left: 4%; margin-right: 4%; padding-top: 0px; background: #1312129a; height:fit-content; display:block; ${retornarDecicionResponsiva('margin-top: 2%;', '')}">
             <h3 style='text-align: center; justify-content: center; margin-bottom: 1%;'>${flujo} ${refenciaActual}</h3>`
         for (let u = 0; u < dinerosTraducidosParaPocentajes.length; u++) {
@@ -176,12 +179,45 @@ function crearGrafica(){
         }  
     cod += `
         </div>
-    </div>`
+    </div>
+    <button onclick="generarPDF()">Generar PDF</button>`
     
     document.getElementById('padreMenu').innerHTML = cod
     generarAnimacionBarras(dinerosTraducidosParaPocentajes)
     arrConcatenado = []
 }
+
+function generarPDF() {
+    var miDiv = document.getElementById('contenido');
+    html2canvas(miDiv, {scrollY: -window.scrollY, scale: 1}).then(function(canvas) {
+        var imgData = canvas.toDataURL('image/png');
+        var pdf = new jsPDF('p', 'mm', 'a4');
+        var width = pdf.internal.pageSize.width;
+        var height = pdf.internal.pageSize.height;
+        height = canvas.height * width / canvas.width;
+        pdf.addImage(imgData, 'PNG', 0, 0, width, height);
+
+        document.getElementById('selectGraficoFlujo').value = 'egresos'
+        refrescarGrafico('flujo', 'selectGraficoFlujo', 'egresos');
+
+        /*/ Introduce un retraso de 2 segundos
+        setTimeout(function() {
+            // Captura el segundo estado del div
+            html2canvas(miDiv, {scrollY: -window.scrollY, scale: 1}).then(function(canvas2) {
+                var imgData2 = canvas2.toDataURL('image/png');
+                pdf.addPage();
+                pdf.addImage(imgData2, 'PNG', 0, 0, width, height);
+
+                // Guarda el PDF
+                pdf.save('miPDF.pdf');
+            });
+        }, 5000);  // Retraso de 5 segundos*/
+    // Guarda el PDF
+    pdf.save('miPDF.pdf');
+    });
+}
+        
+    
 
 function fucionarArreglos(arr){
     for (let u = 0; u < arr.length; u++) {

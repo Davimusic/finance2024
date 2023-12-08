@@ -278,7 +278,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
 
     if(window.location.pathname === '/ingresos'  || window.location.pathname === '/egresos' || uso === 'para modal'){
         cod = `
-        <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; max-height:380px; ${accion2} ${retornarDecicionResponsiva('margin-top: 10%;', '')}"> 
+        <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; height:fit-content; ${accion2} ${retornarDecicionResponsiva('margin-top: 10%;', '')}"> 
             <form method="post">
                 <input style="display:none;" value = "${formUso}" class="borde1 color4" type="text" name="formUso" id="formUso" required>
                 <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>
