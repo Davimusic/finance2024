@@ -283,7 +283,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
                 <input style="display:none;" value = "${formUso}" class="borde1 color4" type="text" name="formUso" id="formUso" required>
                 <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>
                 <input style="display:none;" value = "${signoNumerico}" class="borde1 color4" type="text" name="signoNumerico" required>
-                <input style="display:none;" value = "${ruta}" type="text" name="rutActual">
+                <input style="display:none;" value = "${window.location.pathname}" type="text" name="rutActual">
                 <div style="margin-bottom:10px;">
                     <label for="">Referencia</label>
                 </div> 
