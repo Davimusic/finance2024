@@ -171,7 +171,7 @@ function crearGrafica(){
     `
     ${menu()}
     ${retornarFiltroReferencias(arrReferencias)}
-    <div id="contenido" style="text-align: center; justify-content: center; width: 100%; height: ${((window.innerHeight / 100) * 90)}px; ${retornarDecicionResponsiva('padding-top: 3%;', 'padding-top: 2%;')} overflow-x: auto; margin:0px auto;">
+    <div id="contenido" style="text-align: center; justify-content: center; width: 100%; height: ${((window.innerHeight / 100) * 75)}px; ${retornarDecicionResponsiva('padding-top: 3%;', 'padding-top: 0%;')} overflow-x: auto; margin:0px auto;">
         <div class="borde1 padding1 sombra" style="margin-left: 4%; margin-right: 4%; padding-top: 0px; background: #1312129a; height:fit-content; display:block; ${retornarDecicionResponsiva('margin-top: 2%;', '')}">
             <h3 style='text-align: center; justify-content: center; margin-bottom: 1%;'>${flujo} ${refenciaActual}</h3>`
         for (let u = 0; u < dinerosTraducidosParaPocentajes.length; u++) {

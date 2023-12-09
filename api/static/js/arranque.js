@@ -8,7 +8,7 @@ function arranque(inf){
     code += `
     ${menu()}
     <div id="padre" style="margin: 3%; position:relative; ${heightPantalla()};">
-        <div id="porAhora" style="position: absolute; width:100%; margin-top: 5%; overflow-y: auto; height: ${Math.floor((window.innerHeight / 100) * 90)}px;">
+        <div id="porAhora" style="position: absolute; width:100%; ${retornarDecicionResponsiva('margin-top: 15%;','margin-top: 4.5%;')} overflow-y: auto; height: ${Math.floor((window.innerHeight / 100) * 90)}px;">
             <div style="${retornarDecicionResponsiva('display:block;','display:flex;')} width:100%">` 
 
         code += retornarComponentePorIngresoEgreso(`${retornarComponente(retornarDecicionResponsiva('width:96%;',''), marginInternos,"pedro", "", "", "", "crear","sin valor")}`, '')    
