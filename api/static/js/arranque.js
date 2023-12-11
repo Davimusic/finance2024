@@ -8,7 +8,7 @@ function arranque(inf){
     code += `
     ${menu()}
     <div id="padre" style="margin: 3%; position:relative; ${heightPantalla()};">
-        <div id="porAhora" style="position: absolute; width:100%; ${retornarDecicionResponsiva('margin-top: 15%;','margin-top: 4.5%;')} overflow-y: auto; height: ${Math.floor((window.innerHeight / 100) * 90)}px;">
+        <div id="porAhora" style="position: absolute; width:100%; ${retornarDecicionResponsiva('margin-top: 60px;','margin-top: 4.5%;')} overflow-y: auto; height: ${Math.floor((window.innerHeight / 100) * 90)}px;">
             <div style="${retornarDecicionResponsiva('display:block;','display:flex;')} width:100%">` 
 
         code += retornarComponentePorIngresoEgreso(`${retornarComponente(retornarDecicionResponsiva('width:96%;',''), marginInternos,"pedro", "", "", "", "crear","sin valor")}`, '')    
@@ -262,13 +262,13 @@ function botonEditarTabla(codigo){
     ActivarModal(text, arr[6])
 }
 
-function retornarDecicionResponsiva(celular, desdeTablet){
+function retornarDecicionResponsiva(desdeCelular, desdeComputador){
     let anchoPantalla = window.innerWidth;
 
-    if(anchoPantalla <= 640){
-        return celular
+    if(anchoPantalla <= 1200){
+        return desdeCelular
     } else {
-        return desdeTablet
+        return desdeComputador
     }
 }
                                                                                                         
@@ -278,7 +278,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
 
     if(window.location.pathname === '/ingresos'  || window.location.pathname === '/egresos' || uso === 'para modal'){
         cod = `
-        <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; height:fit-content; ${accion2} ${retornarDecicionResponsiva('margin-top: 10%;', '')}"> 
+        <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; height:fit-content; ${accion2}"> 
             <form method="post">
                 <input style="display:none;" value = "${formUso}" class="borde1 color4" type="text" name="formUso" id="formUso" required>
                 <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>

@@ -1,9 +1,20 @@
 from flask import Flask, render_template, request, redirect, session
 import pymongo                 
 from bson.objectid import ObjectId  # para poder usar _id de mongo
-from datetime import datetime
+from datetime import datetime, timedelta
 import bcrypt # solo para el logeo ya que solo permite encriptar pero no desencriptar
 from cryptography.fernet import Fernet
+
+#import smtplib
+#from email.message import EmailMessage
+
+import io
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+import smtplib
+from reportlab.pdfgen import canvas
 
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
@@ -172,6 +183,9 @@ def retornarInfoReferencia(valorNum):
                             ids[desencriptarText(llave)] = []
                         ids[desencriptarText(llave)].append(index)
                         buscarInfo.append(info)
+    print('buscarInfo')
+    print(buscarInfo)
+
 
     textContenido = ""
     textContenido += retornarReferencias()
@@ -376,7 +390,42 @@ def vistaDeFlujoCompactado():
     if validacionLogeo('', '') ==  'si esta logeado':
         return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas())
     else:
-        return redirect('/')   
+        return redirect('/')  
+
+@app.route('/pdf', methods=["GET"])
+def pdf():
+    # Crear un PDF en memoria
+    packet = io.BytesIO()
+    c = canvas.Canvas(packet)
+    c.drawString(50, 50, "¡Hola, mundo!")
+    c.save()
+
+    # Mover el puntero al inicio del objeto BytesIO
+    packet.seek(0)
+
+    # Crear un objeto de mensaje de correo electrónico
+    message = MIMEMultipart()
+    message['Subject'] = 'Envio de pdf....'
+    message['From'] = 'relaxMusicProject@outlook.es'
+    message['To'] = 'davipianof@gmail.com'
+    message.attach(MIMEText('Hola bro aqui va el pdf'))
+
+    # Adjuntar el PDF al correo electrónico
+    part = MIMEBase('application', "octet-stream")
+    part.set_payload(packet.read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment; filename="hola-mundo.pdf"')
+    message.attach(part)
+
+    # Enviar el correo electrónico
+    smtp = smtplib.SMTP("smtp-mail.outlook.com", port=587)
+    smtp.starttls()
+    smtp.login('relaxMusicProject@outlook.es', "D@vimusic1919")
+    smtp.send_message(message)
+    smtp.quit()
+
+    return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas())
+
 
 @app.route('/crudreferencias', methods=["GET", "POST"])
 def crudreferencias():

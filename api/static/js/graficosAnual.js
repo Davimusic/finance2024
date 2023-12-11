@@ -180,7 +180,7 @@ function crearGrafica(){
     cod += `
         </div>
     </div>
-    <button onclick="generarPDF()">Generar PDF</button>`
+    `//<button onclick="generarPDF()">Generar PDF</button>
     
     document.getElementById('padreMenu').innerHTML = cod
     generarAnimacionBarras(dinerosTraducidosParaPocentajes)
