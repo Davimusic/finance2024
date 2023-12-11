@@ -15,6 +15,10 @@ from email.mime.base import MIMEBase
 from email import encoders
 import smtplib
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, LongTable, Paragraph
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
 
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
@@ -394,30 +398,86 @@ def vistaDeFlujoCompactado():
 
 @app.route('/pdf', methods=["GET"])
 def pdf():
-    # Crear un PDF en memoria
-    packet = io.BytesIO()
-    c = canvas.Canvas(packet)
-    c.drawString(50, 50, "¡Hola, mundo!")
-    c.save()
+    # MongoDB operations
+    doc = myCollection.find_one({"email": session['email']})
 
-    # Mover el puntero al inicio del objeto BytesIO
+    # Create a PDF in memory
+    packet = io.BytesIO()
+    pdf = SimpleDocTemplate(packet, pagesize=letter)
+
+    # Fetch all references and their contents
+    elements = []
+    styles = getSampleStyleSheet()
+    for key in doc['usoDeReferencias']:
+        for u in key.keys():
+            decrypted_key = desencriptarText(u)
+            data = [["Dinero", "Fecha", "Texto", "Fecha de Creación"]]
+            total = 0
+            ingresos = 0
+            egresos = 0
+            for content in key[u]:
+                dinero = int(content['dinero'])
+                total += dinero
+                if dinero > 0:
+                    ingresos += dinero
+                else:
+                    egresos += dinero
+                data.append([content['dinero'], content['fecha'], Paragraph(content['texto'], styles["BodyText"]), content['fechaDeCreacion']])
+            elements.append(Spacer(1, 12))
+            elements.append(Table([["Referencia: " + decrypted_key]], colWidths=[460]))
+            elements.append(Spacer(1, 12))
+            table = LongTable(data, colWidths=[115, 115, 115, 115], splitByRow=True)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0,0), (-1,-1), 1, colors.black)
+            ]))
+            elements.append(table)
+            elements.append(Spacer(1, 12))
+            summary = [["Total Acumulado", ""], ["Ingresos", ingresos], ["Egresos", egresos], ["Total", total]]
+            summary_table = Table(summary, colWidths=[230, 230])
+            summary_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0,0), (-1,-1), 1, colors.black),
+                ('SPAN', (0, 0), (1, 0))
+            ]))
+            elements.append(summary_table)
+
+    pdf.build(elements)
+
+    # Move the pointer to the start of the BytesIO object
     packet.seek(0)
 
-    # Crear un objeto de mensaje de correo electrónico
+    # Create an email message object
     message = MIMEMultipart()
     message['Subject'] = 'Envio de pdf....'
     message['From'] = 'relaxMusicProject@outlook.es'
     message['To'] = 'davipianof@gmail.com'
     message.attach(MIMEText('Hola bro aqui va el pdf'))
 
-    # Adjuntar el PDF al correo electrónico
+    # Attach the PDF to the email
     part = MIMEBase('application', "octet-stream")
     part.set_payload(packet.read())
     encoders.encode_base64(part)
-    part.add_header('Content-Disposition', 'attachment; filename="hola-mundo.pdf"')
+    part.add_header('Content-Disposition', 'attachment; filename="referencias.pdf"')
     message.attach(part)
 
-    # Enviar el correo electrónico
+    # Send the email
     smtp = smtplib.SMTP("smtp-mail.outlook.com", port=587)
     smtp.starttls()
     smtp.login('relaxMusicProject@outlook.es', "D@vimusic1919")
