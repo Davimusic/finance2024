@@ -244,8 +244,9 @@ function traducirInfoDesdeBackend(inf){
 
 function botonEditarTabla(codigo){
     let arr = codigo.split(',');
-    console.log('botonEditarTabla');
     console.log(arr);
+    //console.log('botonEditarTabla');
+    //console.log(arr);
     let text = ""  
     let accion = ""
     if(arr[6] == "¡¡¡Estas en modo edición de contenido!!!"){
@@ -253,13 +254,14 @@ function botonEditarTabla(codigo){
     } else {
         accion = "borrar"
     }   
-    console.log(arr[6]);           
-    console.log(accion);                                                                                                            
-    text =   retornarComponente("", "margin-top:30px; margin-bottom:10px;", arr[0], arr[1], reemplazarCaracter("/", "-", arr[2]), arr[3], accion, arr[5], arr[4], 'para modal', window.location.pathname)
-    console.log('text');
-    console.log(text);
+    //console.log(arr[6]);           
+    //console.log(accion);                                                                                                            
+    text =   retornarComponente("", "margin-top:30px; margin-bottom:10px;", arr[0], arr[1], reemplazarCaracter("/", "-", arr[2]), arr[3], accion, arr[5], arr[4], 'paraModal', window.location.pathname)
+    //console.log('text');
+    //console.log(text);
     actualizarBloqueEnUso("editar contenido modal")
     ActivarModal(text, arr[6])
+    //console.log(arr[4])
 }
 
 function retornarDecicionResponsiva(desdeCelular, desdeComputador){
@@ -274,24 +276,25 @@ function retornarDecicionResponsiva(desdeCelular, desdeComputador){
                                                                                                         
 function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, textoAdicional, formUso, codigoUnico, signoNumerico, uso, ruta){
     let cod = ''
-    console.log(`accion2: ${accion2}, marginInternos: ${marginInternos}, referencia: ${referencia}, dinero: ${dinero}, fecha: ${fecha}, textoAdicional: ${textoAdicional}, formUso: ${formUso}, codigoUnico: ${codigoUnico}, signoNumerico: ${signoNumerico}`);
-
-    if(window.location.pathname === '/ingresos'  || window.location.pathname === '/egresos' || uso === 'para modal'){
+    //console.log(`accion2: ${accion2}, marginInternos: ${marginInternos}, referencia: ${referencia}, dinero: ${dinero}, fecha: ${fecha}, textoAdicional: ${textoAdicional}, formUso: ${formUso}, codigoUnico: ${codigoUnico}, signoNumerico: ${signoNumerico}`);
+    console.log(Referencia);
+    if(window.location.pathname === '/ingresos'  || window.location.pathname === '/egresos' || uso === 'paraModal'){
         cod = `
         <div class="color1 borde1 padding1 sombra" style="max-width:380px; display: inline-block; margin-bottom:5%; height:fit-content; ${accion2}"> 
             <form method="post">
                 <input style="display:none;" value = "${formUso}" class="borde1 color4" type="text" name="formUso" id="formUso" required>
                 <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>
-                <input style="display:none;" value = "${signoNumerico}" class="borde1 color4" type="text" name="signoNumerico" required>
+                <input style="display:none;" value = "${signoNumerico}" id='signoNumerico${uso}' class="borde1 color4" type="text" name="signoNumerico" required>
                 <input style="display:none;" value = "${window.location.pathname}" type="text" name="rutActual">
+                ${retornarEditorSignoNumerico(uso, signoNumerico, marginInternos)}
                 <div style="margin-bottom:10px;">
                     <label for="">Referencia</label>
                 </div> 
                 <select style="width:100%;" class="borde1 color4" name="referencia" id="referencia" required>`
-                for (let u = 0; u < Referencia.length; u++) {
+                for (let u = 0; u < arr.length; u++) {
                     let seleccionar = ""
                     //console.log(`referencia: ${referencia}, Referencia[u]: ${Referencia[u]}`);
-                    if(referencia == Referencia[u]){
+                    if(referencia == arr[u]){
                         seleccionar = "selected"
                     }
                 cod +=`<option ${seleccionar} value="${Referencia[u]}">${Referencia[u]}</option>`
@@ -302,7 +305,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
                 <div style="${marginInternos}">
                     <label for="">Ingreso de dinero</label>
                 </div>    
-                <input style="width:100%;" value="${dinero}" class="borde1 color4" type="number" name="dinero" id="dinero" required> 
+                <input id='formDinero' style="width:100%;" value="${dinero}" class="borde1 color4" type="number" name="dinero" id="dinero" required> 
                 
                 <div style="${marginInternos}">
                     <label for="">Fecha a ingresar</label>
@@ -320,6 +323,36 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
     }
 
     return cod;
+}
+
+function retornarEditorSignoNumerico(uso, signoNumerico, ){
+    let cod = ''
+    if(uso === 'paraModal'){
+        let arrSignos = ['positivo', 'negativo']
+        let arrValores = ['ingresos', 'egresos']
+        cod +=
+        `
+        <div style="${marginInternos}">
+            <label for="">Estado numérico</label>
+        </div> 
+        <select onChange='actualizarSignoNumerico(this.value, "${uso}")' style="width:100%;" class="borde1 color4" id="selectSignoNumerico">`
+                for (let u = 0; u < arrSignos.length; u++) {
+                    let seleccionar = ""
+                    if(signoNumerico == arrSignos[u]){
+                        seleccionar = "selected"
+                    }
+                cod +=`<option ${seleccionar} value="${arrSignos[u]}">${arrValores[u]}</option>`
+                }
+                cod +=    
+        `
+        </select>` 
+    }
+    return cod
+}
+
+function actualizarSignoNumerico(newValue, uso){
+    console.log(newValue);
+    document.getElementById('signoNumerico'+uso).value= newValue
 }
 
 let habilitarUsoEvento = true

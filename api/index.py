@@ -19,6 +19,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, LongTable, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
+from collections import defaultdict
 
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
@@ -66,7 +67,7 @@ def CRUD(accion, valorNum, ruta):
 
         # Encuentra el índice del objeto con la referencia
         index = next((index for (index, d) in enumerate(paso) if desencriptarText(list(d.keys())[0]) == referencia), None)
-        info = {"dinero": dinero, "fecha": fecha, "texto": cambiarValor(',', '-', texto), "fechaDeCreacion": f"{now.year}/{now.month}/{now.day}"}
+        info = {"dinero": encriptarText(dinero), "fecha": encriptarText(fecha), "texto": encriptarText(cambiarValor(',', '-', texto)), "fechaDeCreacion": f"{now.year}/{now.month}/{now.day}"}
         # Si la referencia existe, agrega la nueva información a la lista existente
         if index is not None:
             clave = list(paso[index].keys())[0]
@@ -86,14 +87,24 @@ def CRUD(accion, valorNum, ruta):
         else:
             dinero = retornarNumeroPositivo(int(dinero))
 
-        info = {"dinero": dinero, "fecha": fecha, "texto": cambiarValor(',', '-', texto), "fechaDeCreacion": ''}
+        print('llegaaaa') 
+        print(referencia)   
+
+        info = {"dinero": encriptarText(dinero), "fecha": encriptarText(fecha), "texto": encriptarText(cambiarValor(',', '-', texto)), "fechaDeCreacion": ''}
 
         for key in doc['usoDeReferencias']:
             for u in key.keys():
+                print('desencriptarText(u)')
+                print(desencriptarText(u))
                 if desencriptarText(u) == referencia:
+                    print('entra')
+                    print(desencriptarText(info['dinero']))
+                    print(desencriptarText(info['fecha']))
+                    print(desencriptarText(info['texto']))
                     fechaCreacionOriginal = key[u][int(codUnico)]['fechaDeCreacion']
                     key[u][int(codUnico)] = info
                     key[u][int(codUnico)]['fechaDeCreacion'] = fechaCreacionOriginal
+                    print(info['fechaDeCreacion'])
 
     elif(accion == "borrar"):
 
@@ -180,6 +191,10 @@ def retornarInfoReferencia(valorNum):
     for item in doc['usoDeReferencias']:
         for llave in item.keys():
             for index, fecha in enumerate(item[llave]):
+                # Decrypt the 'texto' field
+                fecha['texto'] = desencriptarText(fecha['texto'])
+                fecha['dinero'] = desencriptarText(fecha['dinero'])
+                fecha['fecha'] = desencriptarText(fecha['fecha'])
                 if f"{now.year}/{now.month}/{now.day}" == fecha['fechaDeCreacion']:
                     info = {desencriptarText(llave): [fecha]}
                     if info not in buscarInfo:
@@ -190,11 +205,11 @@ def retornarInfoReferencia(valorNum):
     print('buscarInfo')
     print(buscarInfo)
 
-
     textContenido = ""
     textContenido += retornarReferencias()
     textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)   
     return render_template('index.html', texto = textContenido)
+
 
 def retornarReferenciasDesglosadas():
     dicc = {}
@@ -215,16 +230,19 @@ def retornarReferenciasDesglosadas():
                         num = i     
                     dicc[f'{decrypted_u}{q}{num}'] = 0           
             for a in referencias:
-                mes = a['fecha'][5:7]
-                dinero = int(a['dinero'])
+                m = desencriptarText(a['fecha'])
+                mes = m[5:7]
+                dinero = int(desencriptarText(a['dinero']))
                 if dinero < 0:
-                    dicc[f'{decrypted_u}@egresos@{mes}'] += int(a['dinero']) 
+                    dicc[f'{decrypted_u}@egresos@{mes}'] += int(desencriptarText(a['dinero'])) 
                 else:
-                    dicc[f'{decrypted_u}@ingresos@{mes}'] += int(a['dinero'])  
+                    dicc[f'{decrypted_u}@ingresos@{mes}'] += int(desencriptarText(a['dinero']))  
 
     text = f'{retornarReferencias()},'
     for i in dicc:
-        text += f"{str(i)}@{str(dicc[i])}@,"    
+        text += f"{str(i)}@{str(dicc[i])}@,"  
+    print('text')    
+    print(text) 
     return text
 
 def validacionLogeo(siLograLogear,siNoLogralogear):
@@ -318,28 +336,36 @@ def buscar_informacion(referencia, fechaUsuario):
     for item in doc['usoDeReferencias']:
         for llave in item.keys():
             for index, info in enumerate(item[llave]):
+                # Decrypt the 'texto', 'dinero', 'fecha', and 'referencia' fields
+                decrypted_info = {
+                    'texto': desencriptarText(info['texto']),
+                    'dinero': desencriptarText(info['dinero']),
+                    'fecha': desencriptarText(info['fecha'])
+                }
+                decrypted_llave = desencriptarText(llave)
+
                 if referencia and fechaUsuario:
-                    if (desencriptarText(llave) == referencia and info['fecha'] == cambiarValor('-', '/', fechaUsuario)):
-                        if desencriptarText(llave) not in buscarInfo:
-                            buscarInfo[desencriptarText(llave)] = []
-                        buscarInfo[desencriptarText(llave)].append(info)
-                        if desencriptarText(llave) not in ids:
-                            ids[desencriptarText(llave)] = []
-                        ids[desencriptarText(llave)].append(index)
-                elif referencia and desencriptarText(llave) == referencia:
-                    if desencriptarText(llave) not in buscarInfo:
-                        buscarInfo[desencriptarText(llave)] = []
-                    buscarInfo[desencriptarText(llave)].append(info)
-                    if desencriptarText(llave) not in ids:
-                        ids[desencriptarText(llave)] = []
-                    ids[desencriptarText(llave)].append(index)
-                elif fechaUsuario and info['fecha'] == cambiarValor('-', '/', fechaUsuario):
-                    if desencriptarText(llave) not in buscarInfo:
-                        buscarInfo[desencriptarText(llave)] = []
-                    buscarInfo[desencriptarText(llave)].append(info)
-                    if desencriptarText(llave) not in ids:
-                        ids[desencriptarText(llave)] = []
-                    ids[desencriptarText(llave)].append(index)
+                    if (decrypted_llave == referencia and decrypted_info['fecha'] == cambiarValor('-', '/', fechaUsuario)):
+                        if decrypted_llave not in buscarInfo:
+                            buscarInfo[decrypted_llave] = []
+                        buscarInfo[decrypted_llave].append(decrypted_info)
+                        if decrypted_llave not in ids:
+                            ids[decrypted_llave] = []
+                        ids[decrypted_llave].append(index)
+                elif referencia and decrypted_llave == referencia:
+                    if decrypted_llave not in buscarInfo:
+                        buscarInfo[decrypted_llave] = []
+                    buscarInfo[decrypted_llave].append(decrypted_info)
+                    if decrypted_llave not in ids:
+                        ids[decrypted_llave] = []
+                    ids[decrypted_llave].append(index)
+                elif fechaUsuario and decrypted_info['fecha'] == cambiarValor('-', '/', fechaUsuario):
+                    if decrypted_llave not in buscarInfo:
+                        buscarInfo[decrypted_llave] = []
+                    buscarInfo[decrypted_llave].append(decrypted_info)
+                    if decrypted_llave not in ids:
+                        ids[decrypted_llave] = []
+                    ids[decrypted_llave].append(index)
 
     # Eliminar las referencias sin coincidencias
     ids = {k: v for k, v in ids.items() if v}
@@ -349,6 +375,8 @@ def buscar_informacion(referencia, fechaUsuario):
         return render_template('index.html', texto = texto)
     else:
         return redirect('/')
+
+
 
 @app.route('/', methods=["GET", "POST"])
 def logeo():
@@ -408,6 +436,11 @@ def pdf():
     # Fetch all references and their contents
     elements = []
     styles = getSampleStyleSheet()
+
+    monthly_totals = defaultdict(lambda: {"ingresos": 0, "egresos": 0, "total": 0})
+    annual_totals = {"ingresos": 0, "egresos": 0, "total": 0}
+    daily_totals = defaultdict(lambda: {"ingresos": 0, "egresos": 0, "total": 0})
+
     for key in doc['usoDeReferencias']:
         for u in key.keys():
             decrypted_key = desencriptarText(u)
@@ -423,6 +456,22 @@ def pdf():
                 else:
                     egresos += dinero
                 data.append([content['dinero'], content['fecha'], Paragraph(content['texto'], styles["BodyText"]), content['fechaDeCreacion']])
+                
+                # Update the monthly and annual totals
+                month = content['fecha'].split('/')[1]  # Assuming the date is in the format "YYYY/MM/DD"
+                monthly_totals[month]["ingresos"] += max(dinero, 0)
+                monthly_totals[month]["egresos"] += min(dinero, 0)
+                monthly_totals[month]["total"] += dinero
+                annual_totals["ingresos"] += max(dinero, 0)
+                annual_totals["egresos"] += min(dinero, 0)
+                annual_totals["total"] += dinero
+
+                # Update the daily totals
+                day = content['fecha']  # Assuming the date is in the format "YYYY/MM/DD"
+                daily_totals[day]["ingresos"] += max(dinero, 0)
+                daily_totals[day]["egresos"] += min(dinero, 0)
+                daily_totals[day]["total"] += dinero
+
             elements.append(Spacer(1, 12))
             elements.append(Table([["Referencia: " + decrypted_key]], colWidths=[460]))
             elements.append(Spacer(1, 12))
@@ -441,6 +490,7 @@ def pdf():
             ]))
             elements.append(table)
             elements.append(Spacer(1, 12))
+
             summary = [["Total Acumulado", ""], ["Ingresos", ingresos], ["Egresos", egresos], ["Total", total]]
             summary_table = Table(summary, colWidths=[230, 230])
             summary_table.setStyle(TableStyle([
@@ -457,6 +507,13 @@ def pdf():
                 ('SPAN', (0, 0), (1, 0))
             ]))
             elements.append(summary_table)
+            elements.append(Spacer(1, 12))
+
+    monthly_totals = defaultdict(lambda: defaultdict(lambda: {"ingresos": 0, "egresos": 0, "total": 0}))
+    annual_totals = {"ingresos": 0, "egresos": 0, "total": 0}
+
+    
+            
 
     pdf.build(elements)
 
