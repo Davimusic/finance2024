@@ -251,16 +251,13 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
     contrasenaComparar = request.form.get("contrasenaComparar")
     estadoLogeo = request.form.get("estadoLogeo")
 
-    return redirect('/')
-
     if siLograLogear == '':
         if 'email' in session and session['email'] != '':
             doc = myCollection.find_one({"email": session['email'], "usoDeReferencias": {"$exists": True}})
             if doc:
                 return 'si esta logeado'
             else:
-                return 'El documento no tiene la llave "usoDeReferencias"'
-            return 'si esta logeado'
+                return redirect('/salir')
         else:
             return 'no esta logeado' 
 
