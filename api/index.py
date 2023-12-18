@@ -255,7 +255,7 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
         if 'email' in session and session['email'] != '':
             doc = myCollection.find_one({"email": session['email'], "usoDeReferencias": {"$exists": True}})
             if doc:
-                return 'El documento tiene la llave "usoDeReferencias"'
+                return 'si esta logeado'
             else:
                 return 'El documento no tiene la llave "usoDeReferencias"'
             return 'si esta logeado'
