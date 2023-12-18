@@ -251,7 +251,7 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
     contrasenaComparar = request.form.get("contrasenaComparar")
     estadoLogeo = request.form.get("estadoLogeo")
 
-    return 'hi'
+    return redirect('/')
 
     if siLograLogear == '':
         if 'email' in session and session['email'] != '':
