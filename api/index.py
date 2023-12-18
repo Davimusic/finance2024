@@ -210,7 +210,6 @@ def retornarInfoReferencia(valorNum):
     textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)   
     return render_template('index.html', texto = textContenido)
 
-
 def retornarReferenciasDesglosadas():
     dicc = {}
     doc = myCollection.find_one({"email": session['email']})
@@ -254,6 +253,11 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
 
     if siLograLogear == '':
         if 'email' in session and session['email'] != '':
+            doc = myCollection.find_one({"email": session['email'], "usoDeReferencias": {"$exists": True}})
+            if doc:
+                return 'El documento tiene la llave "usoDeReferencias"'
+            else:
+                return 'El documento no tiene la llave "usoDeReferencias"'
             return 'si esta logeado'
         else:
             return 'no esta logeado' 
@@ -375,8 +379,6 @@ def buscar_informacion(referencia, fechaUsuario):
         return render_template('index.html', texto = texto)
     else:
         return redirect('/')
-
-
 
 @app.route('/', methods=["GET", "POST"])
 def logeo():
@@ -542,7 +544,6 @@ def pdf():
     smtp.quit()
 
     return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas())
-
 
 @app.route('/crudreferencias', methods=["GET", "POST"])
 def crudreferencias():
