@@ -251,6 +251,8 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
     contrasenaComparar = request.form.get("contrasenaComparar")
     estadoLogeo = request.form.get("estadoLogeo")
 
+    return 'hi'
+
     if siLograLogear == '':
         if 'email' in session and session['email'] != '':
             doc = myCollection.find_one({"email": session['email'], "usoDeReferencias": {"$exists": True}})
