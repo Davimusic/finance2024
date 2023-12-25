@@ -414,8 +414,8 @@ def inicio():
         else:
             return CRUD(accion, '', "/")    
     else:
-        session['email'] = '' 
-        redirect('/') 
+        #session['email'] = '' 
+        #redirect('/') 
         return validacionLogeo("retornarInfoReferencia('positivo')", "redirect('/')")
 
 @app.route('/egresos', methods=["GET", "POST"])
