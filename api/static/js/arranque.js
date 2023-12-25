@@ -1,6 +1,7 @@
 let Referencia = []
 let marginInternos = "margin-top:30px; margin-bottom:10px;"
 let altoPantalla = window.innerHeight;
+let actualReferenciaModal = ''
 
 function arranque(inf){
     Referencia = ordenarAlfaNumerico(retornarReferencias(inf))
@@ -244,24 +245,20 @@ function traducirInfoDesdeBackend(inf){
 
 function botonEditarTabla(codigo){
     let arr = codigo.split(',');
-    console.log(arr);
-    //console.log('botonEditarTabla');
-    //console.log(arr);
     let text = ""  
     let accion = ""
+
     if(arr[6] == "¡¡¡Estas en modo edición de contenido!!!"){
         accion = "editar"
     } else {
         accion = "borrar"
-    }   
-    //console.log(arr[6]);           
-    //console.log(accion);                                                                                                            
+    }    
+
     text =   retornarComponente("", "margin-top:30px; margin-bottom:10px;", arr[0], arr[1], reemplazarCaracter("/", "-", arr[2]), arr[3], accion, arr[5], arr[4], 'paraModal', window.location.pathname)
-    //console.log('text');
-    //console.log(text);
     actualizarBloqueEnUso("editar contenido modal")
     ActivarModal(text, arr[6])
-    //console.log(arr[4])
+    actualReferenciaModal = arr[0]
+    document.getElementById('actualReferenciaModalForm').value = actualReferenciaModal
 }
 
 function retornarDecicionResponsiva(desdeCelular, desdeComputador){
@@ -286,15 +283,15 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
                 <input style="display:none;" value = "${codigoUnico}" class="borde1 color4" type="text" name="codUnico" required>
                 <input style="display:none;" value = "${signoNumerico}" id='signoNumerico${uso}' class="borde1 color4" type="text" name="signoNumerico" required>
                 <input style="display:none;" value = "${window.location.pathname}" type="text" name="rutActual">
-                ${retornarEditorSignoNumerico(uso, signoNumerico, marginInternos)}
+                ${retornarCambioReferenciaForm(uso)}
                 <div style="margin-bottom:10px;">
                     <label for="">Referencia</label>
                 </div> 
                 <select style="width:100%;" class="borde1 color4" name="referencia" id="referencia" required>`
-                for (let u = 0; u < arr.length; u++) {
+                for (let u = 0; u < Referencia.length; u++) {
                     let seleccionar = ""
-                    //console.log(`referencia: ${referencia}, Referencia[u]: ${Referencia[u]}`);
-                    if(referencia == arr[u]){
+                    console.log(`referencia: ${referencia}, arr[u]: ${Referencia[u]} `);
+                    if(referencia == Referencia[u]){
                         seleccionar = "selected"
                     }
                 cod +=`<option ${seleccionar} value="${Referencia[u]}">${Referencia[u]}</option>`
@@ -302,6 +299,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
                 cod +=    
                 `
                 </select>
+                ${retornarEditorSignoNumerico(uso, signoNumerico, marginInternos)}
                 <div style="${marginInternos}">
                     <label for="">Ingreso de dinero</label>
                 </div>    
@@ -323,6 +321,10 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
     }
 
     return cod;
+}
+
+function retornarCambioReferenciaForm(uso){
+    return  (uso === 'paraModal') ? `<input style='display: none;' class="borde1 color4" value = "" type="text" id='actualReferenciaModalForm' name="actualReferenciaModal">` : '';
 }
 
 function retornarEditorSignoNumerico(uso, signoNumerico, ){

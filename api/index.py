@@ -14,12 +14,13 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import smtplib
+'''
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, LongTable, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from collections import defaultdict
+from collections import defaultdict'''
 
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
@@ -55,6 +56,7 @@ def CRUD(accion, valorNum, ruta):
     codUnico = request.form.get("codUnico", '')
     signoNumerico = request.form.get("signoNumerico", '')
     rutActual = request.form.get("rutActual", '')
+    actualReferenciaModal = request.form.get("actualReferenciaModal", '')
 
     doc = myCollection.find_one({"email": session['email']})
     paso = doc['usoDeReferencias']
@@ -81,6 +83,8 @@ def CRUD(accion, valorNum, ruta):
             paso.append({encriptarText(referencia): [info]})'''
 
     elif(accion == "editar"):
+        if actualReferenciaModal != referencia:
+            referencia, actualReferenciaModal = actualReferenciaModal, referencia
 
         if signoNumerico == 'negativo':
             dinero = retornarNumeroNegativo(int(dinero))
@@ -92,19 +96,27 @@ def CRUD(accion, valorNum, ruta):
 
         info = {"dinero": encriptarText(dinero), "fecha": encriptarText(fecha), "texto": encriptarText(cambiarValor(',', '-', texto)), "fechaDeCreacion": ''}
 
-        for key in doc['usoDeReferencias']:
+        # Crea una copia del diccionario para iterar sobre él
+        usoDeReferencias_copia = doc['usoDeReferencias'].copy()
+
+        for i, key in enumerate(usoDeReferencias_copia):
             for u in key.keys():
-                print('desencriptarText(u)')
-                print(desencriptarText(u))
                 if desencriptarText(u) == referencia:
-                    print('entra')
-                    print(desencriptarText(info['dinero']))
-                    print(desencriptarText(info['fecha']))
-                    print(desencriptarText(info['texto']))
+                    # Guarda la fecha de creación original
                     fechaCreacionOriginal = key[u][int(codUnico)]['fechaDeCreacion']
-                    key[u][int(codUnico)] = info
-                    key[u][int(codUnico)]['fechaDeCreacion'] = fechaCreacionOriginal
-                    print(info['fechaDeCreacion'])
+                    
+                    # Actualiza la información directamente en el diccionario original
+                    doc['usoDeReferencias'][i][u][int(codUnico)] = info
+                    doc['usoDeReferencias'][i][u][int(codUnico)]['fechaDeCreacion'] = fechaCreacionOriginal
+                    
+                    if actualReferenciaModal != referencia:
+                        pas = doc['usoDeReferencias'][i][u][int(codUnico)]
+                        #borra el objeto actual de donde esta y serà pasado a la nueva referencia
+                        doc['usoDeReferencias'][i][u].pop(int(codUnico))
+                        for a, key in enumerate(usoDeReferencias_copia):
+                            for e in key.keys():
+                                if desencriptarText(e) == actualReferenciaModal:
+                                    doc['usoDeReferencias'][a][e].append(pas) 
 
     elif(accion == "borrar"):
 
@@ -124,13 +136,15 @@ def CRUD(accion, valorNum, ruta):
         return redirect(ruta)  
 
 def retornarStringInformacion(arr, acc, idFiltrado):
-
+    
     texto = ""
-    count = 0
     for u in arr:
         for key in u.keys():
+            
             count = 0  # Reinicia el contador para cada clave
+            
             for user in u[key]:
+                
                 info = ""
                 if acc == "negativo":
                     if int(user['dinero']) < 0:
@@ -139,11 +153,15 @@ def retornarStringInformacion(arr, acc, idFiltrado):
                     if int(user['dinero']) >= 0:
                         info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º"
                 elif acc == "todos":
-                        info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º"               
-                texto += info
+                    info = f"{key}${user['dinero']}${user['fecha']}${user['texto']}${retornarSigoNumerico(int(user['dinero']))}${idFiltrado[key][count]}º"               
+                if info:
+                    #print(f"Appending info: {info}")
+                    texto += info
+                else:
+                    print(f"Info not appended for key {key} and user {user}")
                 count += 1
     #print(f"texto: {texto}") 
-    return texto 
+    return texto
 
 def retornarSigoNumerico(num):
     if num < 0:
@@ -202,12 +220,12 @@ def retornarInfoReferencia(valorNum):
                             ids[desencriptarText(llave)] = []
                         ids[desencriptarText(llave)].append(index)
                         buscarInfo.append(info)
-    print('buscarInfo')
-    print(buscarInfo)
-
+    
     textContenido = ""
     textContenido += retornarReferencias()
-    textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)   
+    textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)  
+    print('textContenido')
+    print(textContenido) 
     return render_template('index.html', texto = textContenido)
 
 def retornarReferenciasDesglosadas():
@@ -251,12 +269,7 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
     contrasenaComparar = request.form.get("contrasenaComparar")
     estadoLogeo = request.form.get("estadoLogeo")
 
-    print('mirar')
-    if myCollection.find_one({"email": session['d@gmail.com'], "usoDeReferencias": {"$exists": True}}):
-        print('existe')
-    else: 
-        print('no existe')    
-
+    
     if siLograLogear == '':
         if 'email' in session and session['email'] != '':
             return 'si esta logeado'
@@ -377,6 +390,8 @@ def buscar_informacion(referencia, fechaUsuario):
 
     texto = retornarReferencias() + retornarStringInformacion([buscarInfo], "todos", ids)
     if validacionLogeo('', '') ==  'si esta logeado':
+        print('texto')
+        print(texto)
         return render_template('index.html', texto = texto)
     else:
         return redirect('/')
