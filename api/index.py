@@ -413,7 +413,9 @@ def inicio():
             return filtroBuscar()   
         else:
             return CRUD(accion, '', "/")    
-    else:  
+    else:
+        session['email'] = '' 
+        redirect('/') 
         return validacionLogeo("retornarInfoReferencia('positivo')", "redirect('/')")
 
 @app.route('/egresos', methods=["GET", "POST"])
