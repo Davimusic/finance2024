@@ -4,7 +4,10 @@ let altoPantalla = window.innerHeight;
 let actualReferenciaModal = ''
 
 function arranque(inf){
-    Referencia = ordenarAlfaNumerico(retornarReferencias(inf))
+    let info = inf.split('*')[0]
+    let estilos = inf.split('*')[1]
+    
+    Referencia = ordenarAlfaNumerico(retornarReferencias(info))
     let code = ``
     code += `
     ${menu()}
@@ -14,7 +17,7 @@ function arranque(inf){
 
         code += retornarComponentePorIngresoEgreso(`${retornarComponente(retornarDecicionResponsiva('width:96%;',''), marginInternos,"pedro", "", "", "", "crear","sin valor")}`, '')    
             
-    code += `${retornarInterfasIngresoDeInformacionJuntoContabla(inf)}
+    code += `${retornarInterfasIngresoDeInformacionJuntoContabla(info)}
             </div><!--para usar z-index las cordenadas deben tener position absolute-->
         <div id="root" style="z-index: 1000; position: absolute; top: 0; left: 0; right: 0; margin: 0 auto;"></div>  
     </div>`
@@ -24,6 +27,12 @@ function arranque(inf){
     let cod = ""
     cod += modal()
     divPadre.innerHTML = cod;
+
+    if(estilos[0] != ''){
+        console.log(estilos);
+        esti = JSON.parse(estilos)
+        actualizarFondo(esti)
+    }
 }
 
 function retornarComponentePorIngresoEgreso(positivo, negativo){
@@ -284,6 +293,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
                 <input style="display:none;" value = "${signoNumerico}" id='signoNumerico${uso}' class="borde1 color4" type="text" name="signoNumerico" required>
                 <input style="display:none;" value = "${window.location.pathname}" type="text" name="rutActual">
                 ${retornarCambioReferenciaForm(uso)}
+
                 <div style="margin-bottom:10px;">
                     <label for="">Referencia</label>
                 </div> 
@@ -316,7 +326,7 @@ function retornarComponente(accion2, marginInternos,referencia, dinero, fecha, t
                 <input style="width:100%;" value="${textoAdicional}" class="borde1 color4" type="text" name="texto" id="texto">
                 
                 <button id="botonSubmit" onclick="desactivarBotonDespuesDeUsado('botonSubmit')" style="${marginInternos} background: none; border: none; height:40px;" type="submit"><img id='botonSubmitImage' onclick="rotar('botonSubmitImage')" class="efectoMenu" style="background: white; height:40px; border-radius:50%;" src="${retornarLinkBotonSelect()}" alt=""></button>
-            </form>  
+            </form>
         </div>`
     }
 

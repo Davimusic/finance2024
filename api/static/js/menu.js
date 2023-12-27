@@ -1,4 +1,4 @@
-let arr = [['imagen', 'https://res.cloudinary.com/dplncudbq/image/upload/v1701542645/menu1_ui2fw4.png'],['/ingresos', 'Ingresos'],['/egresos', 'Egresos'], ['/vistaDeFlujoReferencias', 'Flujos por referencias'], ['/vistaDeFlujoCompactado', 'Flujos compactado'], ['/crudreferencias', 'Manipular referencias'], ['/pdf', 'enviarPDf'],  ['/salir', '<a href="/salir"><img style="height: 40px; padding: 5px; background: white; border-radius: 50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701542718/logo1_vxrgve.png" alt="" srcset=""></a>'], ['', '']]
+let arr = [['imagen', 'https://res.cloudinary.com/dplncudbq/image/upload/v1701542645/menu1_ui2fw4.png'],['/ingresos', 'Ingresos'],['/egresos', 'Egresos'], ['/vistaDeFlujoReferencias', 'Flujos por referencias'], ['/vistaDeFlujoCompactado', 'Flujos compactado'], ['/crudreferencias', 'Manipular referencias'],  ['/temas', 'Temas'], ['/pdf', 'enviarPDf'],  ['/salir', '<a href="/salir"><img style="height: 40px; padding: 5px; background: white; border-radius: 50%;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1701542718/logo1_vxrgve.png" alt="" srcset=""></a>']]
 //<img style="height: 25px;" src="https://res.cloudinary.com/dplncudbq/image/upload/v1657473822/mias/red-304573_xrlhrp.png" alt="" srcset="">
 
 function menu(){
@@ -33,7 +33,7 @@ function menu(){
                     resaltar = "color2 sombra"
                 }
                 cod +=`    
-                <li class='${resaltar} ${clasEsconder} textoMenu efectoMenu' style="border-radius: 20em; margin: 15px; width:fit-content;"><a class='ListaLimpia mano' style="height:33px; padding-left: 10px; padding-right: 10px" href="${arr[i][0]}">${arr[i][1]}</a></li>
+                <li class='${resaltar} ${clasEsconder} textoMenu efectoMenu' style="background-color: #0000006c; border-radius: 20em; margin: 15px; width:fit-content;"><a class='ListaLimpia mano' style="height:33px; padding-left: 10px; padding-right: 10px" href="${arr[i][0]}">${arr[i][1]}</a></li>
                 `
             } else {
                 cod +=`    
@@ -66,7 +66,7 @@ function menuCelular(){
         bandera = 1
         menu.style.height = `${alturaPantalla}px`
         setTimeout(mostrarTextoMenu, 600);
-        botonMenu.style.marginTop = `${((window.innerHeight / 100) * 20)}px`
+        botonMenu.style.marginTop = `${((window.innerHeight / 100) * 5)}px`
         titulo.style.marginLeft= retornarDecicionResponsiva('padding-left: 15%;', 'padding-left:35%;');
     } else {
         bandera = 0

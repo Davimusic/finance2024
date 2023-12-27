@@ -1,12 +1,18 @@
 let arrContenido = [], flujo = '', refenciaActual = '', arrReferencias =  [], path = '', arrConcatenado = [];
 
 function infoAnual(meses){
+    let info = meses.split('*')[0]
+    let estilos = meses.split('*')[1]
     path = window.location.pathname
-    arrContenido = traducirInformacionGraficos(`${meses}`)
+    arrContenido = traducirInformacionGraficos(`${info}`)
     flujo = 'ingresos'
-    arrReferencias = ordenarAlfaNumerico(retornarReferenciasGraficos(meses))
+    arrReferencias = ordenarAlfaNumerico(retornarReferenciasGraficos(info))
     refenciaActual = arrReferencias[0]
     crearGrafica()
+    if(estilos.length != 0){
+        esti = JSON.parse(estilos)
+        actualizarFondo(esti)
+    }
 }
 
 function retornarFiltroReferencias(arr){

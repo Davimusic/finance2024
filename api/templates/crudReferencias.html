@@ -16,7 +16,9 @@
 </body>
 <script>
 function a(texto, aviso){
-    let Referencia = retornarReferencias(texto)
+    let refs = texto.split('*')[0]
+    let estilos = texto.split('*')[1]
+    let Referencia = retornarReferencias(refs)
     console.log(Referencia);
     let referencia = ""
     let cod = `
@@ -84,6 +86,10 @@ function a(texto, aviso){
     if(aviso != ''){
         alert(aviso)
     }
+    if(estilos.length != 0){
+        esti = JSON.parse(estilos)
+        actualizarFondo(esti)
+    }
 }
 
 function verificarContenidoArreglo(arr, accSiEstaVacio, accSiNoEstaVacio){
@@ -125,6 +131,7 @@ function activarSwicht(id){
 <script type="text/javascript" src="{{ url_for('static', filename='js/modal.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/menu.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/graficosAnual.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/temasFondo.js') }}"></script>
 
 
 </html>

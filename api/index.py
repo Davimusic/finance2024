@@ -4,6 +4,7 @@ from bson.objectid import ObjectId  # para poder usar _id de mongo
 from datetime import datetime, timedelta
 import bcrypt # solo para el logeo ya que solo permite encriptar pero no desencriptar
 from cryptography.fernet import Fernet
+import json
 
 #import smtplib
 #from email.message import EmailMessage
@@ -14,13 +15,13 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 import smtplib
-'''
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, LongTable, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, LongTable, Paragraph, PageBreak
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from collections import defaultdict'''
+from collections import defaultdict
+from reportlab.lib.units import mm
 
 clave = b'C0eBZ2GSloqabxyT855f6tkbSfdIaJDx_K1Ljiymxkk='#para encriptar informacion desencriptable
 f = Fernet(clave)
@@ -226,7 +227,7 @@ def retornarInfoReferencia(valorNum):
     textContenido += retornarStringInformacion(buscarInfo, valorNum, ids)  
     print('textContenido')
     print(textContenido) 
-    return render_template('index.html', texto = textContenido)
+    return render_template('index.html', texto = textContenido + '*' + json.dumps(doc['estilos']))
 
 def retornarReferenciasDesglosadas():
     dicc = {}
@@ -295,7 +296,14 @@ def validacionLogeo(siLograLogear,siNoLogralogear):
                 if comprarContrasenas(password, contrasenaComparar):
                     if analizarSignosProhibidos(email, caracteres_permitidos=['@', '.']):
                         ashed_password = encriptarContrasena(password)
-                        myCollection.insert_one({"email": email, 'password': ashed_password, "usoDeReferencias": []})
+                        myCollection.insert_one({"email": email,
+                                                'password': ashed_password, 
+                                                "usoDeReferencias": [],
+                                                'estilos': {'fondo':'https://res.cloudinary.com/dplncudbq/image/upload/v1656550241/mias/8_ksv971.png',
+                                                            'color1': '#16272A',
+                                                            'color2': 'black',
+                                                            'color3': '#697376',
+                                                            'color4': '#1e2c3a'}})
                         session['email'] = email
                         return  eval(siLograLogear)
                     else: 
@@ -392,9 +400,14 @@ def buscar_informacion(referencia, fechaUsuario):
     if validacionLogeo('', '') ==  'si esta logeado':
         print('texto')
         print(texto)
-        return render_template('index.html', texto = texto)
+        return render_template('index.html', texto = texto + '*' + json.dumps(doc['estilos']))
     else:
         return redirect('/')
+
+def obtener_mes(fecha):
+    meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+    mes = int(fecha.split('/')[1]) - 1
+    return meses[mes]
 
 @app.route('/', methods=["GET", "POST"])
 def logeo():
@@ -430,113 +443,319 @@ def egresos():
     else:  
         return validacionLogeo("retornarInfoReferencia('negativo')", "redirect('/')")
 
+@app.route('/temas', methods=["GET", "POST"])
+def temas():
+    doc = myCollection.find_one({"email": session['email']})
+
+    if request.method == "POST": 
+        linkImagenFondo = request.form["linkImagenFondo"]
+        color1 = request.form["color1"]
+        color2 = request.form["color2"]
+        color3 = request.form["color3"]
+        color4 = request.form["color4"]
+        paso = doc['estilos']
+        paso = {'fondo': linkImagenFondo,
+                'color1': color1, 'color2': color2, 'color3': color3, 'color4': color4}
+        updateTask = {"$set":{'estilos': paso}}
+        myCollection.update_one({"_id": doc['_id']}, updateTask) 
+        
+        return render_template('temas.html', estilos = json.dumps(paso))
+    else:
+        return validacionLogeo(f"render_template('temas.html', estilos = '{json.dumps(doc['estilos'])}')", "redirect('/')")
+
 @app.route('/vistaDeFlujoReferencias', methods=["GET", "POST"])
 def vistaDeFlujoReferencias():
+    doc = myCollection.find_one({"email": session['email']})
+
     if validacionLogeo('', '') ==  'si esta logeado':
-        return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas())
+        return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas() + '*' + json.dumps(doc['estilos']))
     else:
         return redirect('/')       
     
 @app.route('/vistaDeFlujoCompactado', methods=["GET", "POST"])
 def vistaDeFlujoCompactado():
+    doc = myCollection.find_one({"email": session['email']})
+
     if validacionLogeo('', '') ==  'si esta logeado':
-        return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas())
+        return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas() + '*' + json.dumps(doc['estilos']))
     else:
         return redirect('/')  
 
 @app.route('/pdf', methods=["GET"])
 def pdf():
     # MongoDB operations
+    '''
     doc = myCollection.find_one({"email": session['email']})
 
-    # Create a PDF in memory
     packet = io.BytesIO()
     pdf = SimpleDocTemplate(packet, pagesize=letter)
-
-    # Fetch all references and their contents
     elements = []
+
     styles = getSampleStyleSheet()
+    styleN = styles['BodyText']
+    styleN.wordWrap = 'CJK'
+    styleBH = styles['Normal']
+    styleBH.wordWrap = 'CJK'
 
-    monthly_totals = defaultdict(lambda: {"ingresos": 0, "egresos": 0, "total": 0})
-    annual_totals = {"ingresos": 0, "egresos": 0, "total": 0}
-    daily_totals = defaultdict(lambda: {"ingresos": 0, "egresos": 0, "total": 0})
+    sumaTotalAnual = 0
+    mesesIngresosAnual = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
+    mesesEgresosAnual  = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
 
-    for key in doc['usoDeReferencias']:
+    for i, key in enumerate(doc['usoDeReferencias']):
         for u in key.keys():
-            decrypted_key = desencriptarText(u)
-            data = [["Dinero", "Fecha", "Texto", "Fecha de Creación"]]
-            total = 0
-            ingresos = 0
-            egresos = 0
-            for content in key[u]:
-                dinero = int(content['dinero'])
-                total += dinero
-                if dinero > 0:
-                    ingresos += dinero
-                else:
-                    egresos += dinero
-                data.append([content['dinero'], content['fecha'], Paragraph(content['texto'], styles["BodyText"]), content['fechaDeCreacion']])
-                
-                # Update the monthly and annual totals
-                month = content['fecha'].split('/')[1]  # Assuming the date is in the format "YYYY/MM/DD"
-                monthly_totals[month]["ingresos"] += max(dinero, 0)
-                monthly_totals[month]["egresos"] += min(dinero, 0)
-                monthly_totals[month]["total"] += dinero
-                annual_totals["ingresos"] += max(dinero, 0)
-                annual_totals["egresos"] += min(dinero, 0)
-                annual_totals["total"] += dinero
+            data = []
+            conte = doc['usoDeReferencias'][i][u]
+            data.append(['---------------'])#para espacio
+            data.append([Paragraph(desencriptarText(u), styleN)])
+            data.append([])#para espacio
+            suma = 0
+            mesesIngresos = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
+            mesesEgresos  = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
+            for a in conte:
+                row = [Paragraph(desencriptarText(a['texto']), styleN), desencriptarText(a['dinero']), desencriptarText(a['fecha'])]
+                suma += int(desencriptarText(a['dinero']))
+                if int(desencriptarText(a['dinero'])) < 0:
+                    mesesEgresos[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))
+                    mesesEgresosAnual[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))
+                else: 
+                    mesesIngresos[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))    
+                    mesesIngresosAnual[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))
+                data.append(row)
 
-                # Update the daily totals
-                day = content['fecha']  # Assuming the date is in the format "YYYY/MM/DD"
-                daily_totals[day]["ingresos"] += max(dinero, 0)
-                daily_totals[day]["egresos"] += min(dinero, 0)
-                daily_totals[day]["total"] += dinero
+            data.append([])#para espacio
+            data.append(['Meses ingresos'])
+            for mes, valor in mesesIngresos.items():
+                data.append([mes, valor])
 
-            elements.append(Spacer(1, 12))
-            elements.append(Table([["Referencia: " + decrypted_key]], colWidths=[460]))
-            elements.append(Spacer(1, 12))
-            table = LongTable(data, colWidths=[115, 115, 115, 115], splitByRow=True)
-            table.setStyle(TableStyle([
+            data.append([])#para espacio
+            data.append(['Meses egresos'])
+            for mes, valor in mesesEgresos.items():
+                data.append([mes, valor])
+
+            data.append([])  # Espacio
+            data.append(['Total por mes'])
+            for mes in mesesIngresos.keys():
+                total = mesesIngresos[mes] - mesesEgresos[mes]
+                data.append([mes, total])        
+
+            data.append([])#para espacio
+            data.append([f'total anual {desencriptarText(u)}: ${suma}'])
+            sumaTotalAnual += suma
+
+
+    data = []
+    data.append(['---------------'])  # Espacio
+    data.append(['Total anual solo ingresos'])
+    for mes, valor in mesesIngresosAnual.items():
+        data.append([mes, valor])
+
+    data.append([])  # Espacio
+    data.append(['Total anual solo egresos'])
+    for mes, valor in mesesEgresosAnual.items():
+        data.append([mes, valor])
+
+    data.append([])  # Espacio
+    data.append(['Total anual'])
+    for mes in mesesIngresosAnual.keys():
+        total = mesesIngresosAnual[mes] + mesesEgresosAnual[mes]
+        data.append([mes, total]) 
+
+    data.append([])#para espacio
+    data.append([f'total anual toda referencia: ${sumaTotalAnual}'])
+
+    elements.append(table)
+
+    # Construye el PDF con los elementos
+    pdf.build(elements)'''
+    # MongoDB operations
+    doc = myCollection.find_one({"email": session['email']})
+
+    packet = io.BytesIO()
+    pdf = SimpleDocTemplate(packet, pagesize=letter)
+    elements = []
+
+    styles = getSampleStyleSheet()
+    styleN = styles['BodyText']
+    styleN.wordWrap = 'CJK'
+    styleBH = styles['Normal']
+    styleBH.wordWrap = 'CJK'
+    styleBH.alignment = 1  # Center alignment
+    styleBH.fontSize = 14
+    styleBH.leading = 16
+
+    # Add creation date and time at the beginning of the document
+    creation_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    elements.append(Paragraph(f"Fecha y hora de creación del archivo: {creation_time}", styleN))
+    elements.append(Spacer(1, 12))
+
+    sumaTotalAnual = 0
+    mesesIngresosAnual = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
+    mesesEgresosAnual  = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
+
+    for i, key in enumerate(doc['usoDeReferencias']):
+        for u in key.keys():
+            data = []
+            conte = doc['usoDeReferencias'][i][u]
+            title = [[Paragraph('<b>' + desencriptarText(u) + '</b>', styleBH)]]
+            title_table = Table(title, colWidths=[450])
+            title_table.setStyle(TableStyle([
                 ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-
                 ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
                 ('FONTSIZE', (0, 0), (-1, 0), 14),
-
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0,0), (-1,-1), 1, colors.black)
+                ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
             ]))
-            elements.append(table)
-            elements.append(Spacer(1, 12))
+            elements.append(title_table)
+            elements.append(Spacer(1, 12))  # Add a space after each table
 
-            summary = [["Total Acumulado", ""], ["Ingresos", ingresos], ["Egresos", egresos], ["Total", total]]
-            summary_table = Table(summary, colWidths=[230, 230])
-            summary_table.setStyle(TableStyle([
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-
-                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 14),
-
-                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-                ('GRID', (0,0), (-1,-1), 1, colors.black),
-                ('SPAN', (0, 0), (1, 0))
-            ]))
-            elements.append(summary_table)
-            elements.append(Spacer(1, 12))
-
-    monthly_totals = defaultdict(lambda: defaultdict(lambda: {"ingresos": 0, "egresos": 0, "total": 0}))
-    annual_totals = {"ingresos": 0, "egresos": 0, "total": 0}
-
-    
+            suma = 0
+            mesesIngresos = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
+            mesesEgresos  = {'Enero': 0, 'Febrero': 0, 'Marzo': 0, 'Abril': 0, 'Mayo': 0, 'Junio': 0, 'Julio': 0, 'Agosto': 0 , 'Septiembre': 0, 'Octubre': 0, 'Noviembre': 0, 'Diciembre': 0} 
             
+            
+            for a in conte:
+                row = [Paragraph(desencriptarText(a['texto']), styleN), desencriptarText(a['dinero']), desencriptarText(a['fecha'])]
+                suma += int(desencriptarText(a['dinero']))
+                if int(desencriptarText(a['dinero'])) < 0:
+                    mesesEgresos[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))
+                    mesesEgresosAnual[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))
+                else: 
+                    mesesIngresos[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))    
+                    mesesIngresosAnual[obtener_mes(desencriptarText(a['fecha']))] += int(desencriptarText(a['dinero']))
+                data.append(row)
+            
+            if len(data) != 0:
+                
+                elements.append(tabla2('mirar', data)) 
+                elements.append(Spacer(1, 12))
+            
+            #elements.append(tabla(f'Informacion Ingresada {desencriptarText(u)}', data))
 
-    pdf.build(elements)
+            data = []
+            data.append([data.append([[Paragraph('<b>' + 'Meses ingresos ' +  desencriptarText(u) + '</b>', styleBH)]])])
+            for mes, valor in mesesIngresos.items():
+                data.append([mes, valor])
+            table = Table(data, colWidths=[100, 200, 150], repeatRows=1)
+            table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (-1, 0), 14),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                            ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
+                        ]))
+            elements.append(table)  
+            elements.append(Spacer(1, 12))      
 
+            
+            data = []
+            data.append([data.append([[Paragraph('<b>' + 'Meses egresos ' +  desencriptarText(u) + '</b>', styleBH)]])])
+            for mes, valor in mesesEgresos.items():
+                data.append([mes, valor])
+            table = Table(data, colWidths=[100, 200, 150], repeatRows=1)
+            table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (-1, 0), 14),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                            ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
+                        ]))
+            elements.append(table)
+            elements.append(Spacer(1, 12))       
+
+            
+            data.append(['Total por mes'])
+            for mes in mesesIngresos.keys():
+                total = mesesIngresos[mes] - mesesEgresos[mes]
+                data.append([mes, total])        
+
+            data.append([])#para espacio
+            data.append([f'total anual {desencriptarText(u)}: ${suma}'])
+            sumaTotalAnual += suma
+
+
+    data = []
+    data.append(['---------------'])  # Espacio
+    data.append(['Total anual solo ingresos'])
+    for mes, valor in mesesIngresosAnual.items():
+        data.append([mes, valor])
+
+    data.append([])  # Espacio
+    data.append(['Total anual solo egresos'])
+    for mes, valor in mesesEgresosAnual.items():
+        data.append([mes, valor])
+
+    data.append([])  # Espacio
+    data.append(['Total anual'])
+    for mes in mesesIngresosAnual.keys():
+        total = mesesIngresosAnual[mes] + mesesEgresosAnual[mes]
+        data.append([mes, total]) 
+
+    data.append([])#para espacio
+    data.append([f'total anual toda referencia: ${sumaTotalAnual}'])
+
+    table = Table(data, colWidths=[100, 200, 150], repeatRows=1)
+    table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 14),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
+            ]))
+
+    elements.append(table)
+    elements.append(Spacer(1, 12))  # Add a space after each table
+    elements.append(PageBreak())  # Add a page break after each reference        
+
+    elements.append(tabla(f'Total anual solo ingresos', mesesIngresosAnual, 'mesValor'))
+    elements.append(tabla(f'Total anual solo egresos', mesesEgresosAnual, 'mesValor')) 
+
+
+    data = []
+    
+
+    data.append([Paragraph('<b>Total anual</b>', styleBH)])
+    for mes in mesesIngresosAnual.keys():
+        total = mesesIngresosAnual[mes] + mesesEgresosAnual[mes]
+        data.append([mes, total]) 
+
+    data.append([Paragraph(f'<b>total anual toda referencia: ${sumaTotalAnual}</b>', styleBH)])
+
+    table = Table(data, colWidths=[100, 200, 150], repeatRows=1)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 14),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
+    ]))
+
+    elements.append(table)
+
+    # Add page numbers at the end of each page
+    def add_page_number(canvas, doc):
+        page_num = canvas.getPageNumber()
+        text = "Page %s" % page_num
+        canvas.drawRightString(200*mm, 20*mm, text)
+
+    pdf.build(elements, onFirstPage=add_page_number, onLaterPages=add_page_number)
     # Move the pointer to the start of the BytesIO object
     packet.seek(0)
 
@@ -563,15 +782,74 @@ def pdf():
 
     return render_template('graficosAnual.html', meses = retornarReferenciasDesglosadas())
 
+def tabla(titulo, dicc, acc):
+    data = []
+    styles = getSampleStyleSheet()
+    styleN = styles['BodyText']
+    styleN.wordWrap = 'CJK'
+    styleBH = styles['Normal']
+    styleBH.wordWrap = 'CJK'
+    styleBH.alignment = 1  # Center alignment
+    styleBH.fontSize = 14
+    styleBH.leading = 16
+
+    data.append([[Paragraph('<b>' + f'{titulo}' + '</b>', styleBH)]])
+
+    if acc == 'mesValor':
+        for mes, valor in dicc.items():
+            data.append([mes, valor])
+    elif acc == 'anotaciones':  
+        #data.append([Paragraph('<b>' + f'{titulo}' + '</b>', styleBH)]) 
+        data.append(dicc)  
+
+    table = Table(data, colWidths=[100, 200, 150], repeatRows=1)
+    table.setStyle(TableStyle([
+                            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                            ('FONTSIZE', (0, 0), (-1, 0), 14),
+                            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                            ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
+                        ])) 
+    return table   
+
+def tabla2(titulo, data):
+    styles = getSampleStyleSheet()
+    styleN = styles['BodyText']
+    styleN.wordWrap = 'CJK'
+    styleBH = styles['Normal']
+    styleBH.wordWrap = 'CJK'
+    styleBH.alignment = 1  # Center alignment
+    styleBH.fontSize = 14
+    styleBH.leading = 16
+
+    table = Table(data, colWidths=[100, 200, 150], repeatRows=1)
+    table.setStyle(TableStyle([
+                                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                                ('FONTSIZE', (0, 0), (-1, 0), 14),
+                                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                                ('SPAN', (0, 0), (-1, 0)),  # Merge cells in the first row
+                            ]))
+    return table
+
 @app.route('/crudreferencias', methods=["GET", "POST"])
 def crudreferencias():
+    doc = myCollection.find_one({"email": session['email']})
+
     if request.method == "POST": 
         accion = request.form["formUso"]
         crear = request.form["crear"]
         cambiar = request.form["cambiar"]
         nuevocambiar = request.form["nuevocambiar"]
-        borrar = request.form["borrar"]
-        doc = myCollection.find_one({"email": session['email']})
+        borrar = request.form["borrar"]        
 
         if accion == 'crear':
 
@@ -629,8 +907,10 @@ def crudreferencias():
             myCollection.update_one({"_id": doc['_id']}, {"$set": {"usoDeReferencias": arr}})
 
         return redirect('/crudreferencias')
-    else:  
-        return render_template('crudReferencias.html', texto = retornarReferenciasDesglosadas(), aviso = '') 
+    else:
+        print('verifica')
+        print(doc)  
+        return render_template('crudReferencias.html', texto = retornarReferenciasDesglosadas() + '*' + json.dumps(doc['estilos']), aviso = '') 
 
 @app.route('/<dato>', methods=["GET", "POST"])
 def filtroReferencia(dato):

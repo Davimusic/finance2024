@@ -8,11 +8,11 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Playfair Display">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css' ) }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css' ) }}">
-    <title>Anotaciones</title>
+    <title>Temas</title>
 </head>
-<body onload="arranque('{{ texto }}')">
-    <div id="cs"></div>
+<body onload="arranqueTemas('{{ estilos }}')">
     <div id="padreMenu" style="overflow: hidden; height: 40px; overflow-y: auto;"></div>
+    
 </body>
 
 <script type="text/javascript" src="{{ url_for('static', filename='js/arranque.js') }}"></script>
