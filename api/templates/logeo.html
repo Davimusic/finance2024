@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css' ) }}">
     <title>logeo</title>
 </head>
-<body onload="aviso('{{ mensaje }}')">
+<body onload="aviso('{{ mensaje }}', '{{ ruta }}')">
 
     <div id='padre' style='display: flex; justify-content: center; align-items: center; height: 100vh;'>
         <div class='color1 borde1 padding1 sombra' style='width: fit-content; height: fit-content;'>
@@ -60,13 +60,16 @@
         estadoLogeo.value = acc
     }
 
-    function aviso(mensaje){
-        if(mensaje === 'No puedes algun tipo de comilla para textos usar solo puedes ingresar números y letras en "Texto adicional" información no guardada'){
+    async function aviso(mensaje, rutaActual){
+        if(mensaje === 'No puedes algun tipo de comilla para textos usar solo puedes ingresar números y letras en "Texto adicional" información no guardada' 
+        || mensaje === 'En ingreso de dinero solo puedes ingresar números'
+        || mensaje === 'El estado finaciero fue enviado con exito a tu correo'){
+                const ruta = window.location.href
                 const padre = document.getElementById('padre')
                 padre.style.backgroundColor = 'black'
                 padre.innerHTML = ''
-                window.location.href = "/ingresos";
-                setTimeout(function() { alert(mensaje) }, 200);
+                await setTimeout(function() { alert(mensaje) }, 200);
+                window.location.href = rutaActual
         } else if(mensaje != ''){
             alert(mensaje)
         }

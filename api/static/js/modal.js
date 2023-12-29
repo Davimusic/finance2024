@@ -65,8 +65,20 @@ function modal(contenido, titulo){
 		</div>
 	</div>
 	`
+	actualizarEstilosModal()
     return cod
 }
+
+
+function actualizarEstilosModal(){
+	setTimeout(() => {
+        if(estilosGlobal[0] != ''){
+            actualizarFondo(estilosGlobal);
+            console.log('fue');
+        }
+    }, 100);
+}
+
 
 function saludar(text){
 	alert(text);

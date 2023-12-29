@@ -2,6 +2,7 @@ let Referencia = []
 let marginInternos = "margin-top:30px; margin-bottom:10px;"
 let altoPantalla = window.innerHeight;
 let actualReferenciaModal = ''
+let estilosGlobal = {}
 
 function arranque(inf){
     let info = inf.split('*')[0]
@@ -31,6 +32,7 @@ function arranque(inf){
     if(estilos[0] != ''){
         console.log(estilos);
         esti = JSON.parse(estilos)
+        estilosGlobal = esti
         actualizarFondo(esti)
     }
 }
