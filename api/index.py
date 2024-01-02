@@ -32,7 +32,7 @@ app.secret_key = 'mi clave secreta'
 #conexcion a base de datos     
 myClient = pymongo.MongoClient('mongodb+srv://davis123:davis123@cluster0.hujqu.mongodb.net/test3')
 myDb = myClient["contabilidadPublica"]#basde de datos
-myCollection=myDb["2024"]
+myCollection=myDb["coleccion1"] 
 
 
 def cambiarValor(busca, cambia, text):
