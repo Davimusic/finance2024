@@ -31,8 +31,9 @@ app.secret_key = 'mi clave secreta'
 
 #conexcion a base de datos     
 myClient = pymongo.MongoClient('mongodb+srv://davis123:davis123@cluster0.hujqu.mongodb.net/test3')
-myDb = myClient["contabilidadPublica"]#basde de datos
+myDb = myClient["contabilidadPublica2025"]#basde de datos contabilidadPublica es la del 2024
 myCollection=myDb["coleccion1"] 
+print('2025 ahora')
 
 
 def cambiarValor(busca, cambia, text):
@@ -673,6 +674,7 @@ def pdf():
     # Move the pointer to the start of the BytesIO object
     packet.seek(0)
 
+    print(elements)
     # Create an email message object
     message = MIMEMultipart()
     message['Subject'] = 'Envio de información financiera'
@@ -712,7 +714,7 @@ def tabla(titulo, dicc, acc):
 
     if acc == 'mesValor':
         print('mirar dic')
-        print(dicc)
+        #print(dicc)
         for mes, valor in dicc.items():
             data.append([mes, formatearNumero(valor)])
     elif acc == 'anotaciones':  
